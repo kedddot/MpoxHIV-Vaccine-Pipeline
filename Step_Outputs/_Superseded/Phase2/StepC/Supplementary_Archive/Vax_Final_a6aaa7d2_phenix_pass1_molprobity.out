@@ -1,0 +1,123 @@
+
+=============================== Model properties ==============================
+
+   Number of:
+     all atoms      : 3794
+     H or D atoms   : 0
+     chains         : 1
+     a.a. residues  : 496
+     nucleotides    : 0
+     water          : 0
+     other (ligands): 0
+   Ligands: None
+
+============================= Geometry restraints =============================
+
+
+                        ----------Bond lengths----------                       
+
+  All restrained atoms within 4.0 sigma of ideal values.
+
+  Min. delta:    0.000 (Z=  0.000)
+  Max. delta:    0.016 (Z=  0.915)
+  Mean delta:    0.003 (Z=  0.174)
+
+                        ----------Bond angles----------                        
+
+  All restrained atoms within 4.0 sigma of ideal values.
+
+  Min. delta:    0.000 (Z=  0.000)
+  Max. delta:    5.212 (Z=  2.896)
+  Mean delta:    0.855 (Z=  0.386)
+
+                      ----------Dihedral angles----------                      
+
+  All restrained atoms within 4.0 sigma of ideal values.
+
+  Min. delta:    0.000 (Z=  0.000)
+  Max. delta:   72.849 (Z=  3.837)
+  Mean delta:   11.490 (Z=  0.695)
+
+                       ----------Chiral volumes----------                      
+
+  All restrained atoms within 4.0 sigma of ideal values.
+
+  Min. delta:    0.000
+  Max. delta:    0.126
+  Mean delta:    0.037
+
+                       ----------Planar groups----------                       
+
+  All restrained atoms within 4.0 sigma of ideal values.
+
+  Min. delta:    0.000
+  Max. delta:    0.017
+  Mean delta:    0.002
+
+============================ Molprobity validation ============================
+
+
+  Geometry Restraints Library: GeoStd + Monomer Library
+  Deviations from Ideal Values - rmsd, rmsZ for bonds and angles.
+    Bond      :  0.003   0.016   3894  Z= 0.174
+    Angle     :  0.855   5.212   5289  Z= 0.386
+    Chirality :  0.037   0.126    571
+    Planarity :  0.002   0.017    680
+    Dihedral  : 11.490  72.849   1459
+    Min Nonbonded Distance : 2.576
+  
+  Molprobity Statistics.
+    All-atom Clashscore : 0.52
+    Ramachandran Plot:
+      Outliers :  0.61 %
+      Allowed  :  0.20 %
+      Favored  : 99.19 %
+    Rotamer:
+      Outliers :  0.25 %
+      Allowed  :  4.49 %
+      Favored  : 95.26 %
+    Cbeta Deviations :  0.00 %
+    Peptide Plane:
+      Cis-proline     : 0.00 %
+      Cis-general     : 0.22 %
+      Twisted Proline : 0.00 %
+      Twisted General : 0.00 %
+  
+  Rama-Z values with (uncertainties):
+  Interpretation: poor |Rama-Z| > 3; suspicious 2 < |Rama-Z| < 3; good |Rama-Z| < 2.
+  Scores below are scaled independently, so they are not related in a simple way.
+    whole: -0.46 (0.37), residues: 494
+    helix:  2.42 (0.49), residues: 101
+    sheet:  0.68 (0.58), residues: 85
+    loop : -1.67 (0.32), residues: 308
+  
+  Max deviation from planes:
+     Type  MaxDev  MeanDev LineInFile
+   ARG   0.000   0.000   ARG A  42 
+   TYR   0.001   0.000   TYR A  99 
+   PHE   0.001   0.000   PHE A 170 
+   TRP   0.001   0.000   TRP A  77 
+   HIS   0.000   0.000   HIS A 167 
+  
+  
+  
+  Details of bonding type rmsd/Z
+    covalent geometry    : bond        0.00322 /  0.17 ( 3890)
+    covalent geometry    : angle       0.85535 /  0.39 ( 5281)
+    SS BOND              : bond        0.00072 /  0.04 (    4)
+    SS BOND              : angle       0.28660 /  0.15 (    8)
+
+                     ----------Asn/Gln/His flips----------                     
+
+   A 137  GLN
+
+=================================== Summary ===================================
+
+  Ramachandran outliers =   0.61 %
+                favored =  99.19 %
+  Rotamer outliers      =   0.25 %
+  C-beta deviations     =     0
+  Clashscore            =   0.52
+  RMS(bonds)            =   0.0032
+  RMS(angles)           =   0.85
+  MolProbity score      =   0.68

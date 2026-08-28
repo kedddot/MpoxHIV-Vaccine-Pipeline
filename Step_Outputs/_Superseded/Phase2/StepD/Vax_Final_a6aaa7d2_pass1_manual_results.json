@@ -1,0 +1,8 @@
+{
+  "molprobity_score": 0.68,
+  "clashscore": 0.52,
+  "poor_rotamers_percent": 0.25,
+  "rama_favored_percent": 99.19,
+  "rama_allowed_percent": 0.2,
+  "rama_outlier_percent": 0.61
+}

@@ -1,0 +1,83 @@
+Target,Accession,Clade_Tag,Confirmed
+Mpox_L1R,XYR87238.1,Clade Iib,True
+Mpox_L1R,XYR87197.1,Clade Iib,True
+Mpox_L1R,XYR87060.1,Clade Iib,True
+Mpox_L1R,XYR87019.1,Clade Iib,True
+Mpox_L1R,XYR86883.1,Clade Iib,True
+Mpox_L1R,XYR86842.1,Clade Iib,True
+Mpox_L1R,XYR86706.1,Clade Iib,True
+Mpox_L1R,XYR86665.1,Clade Iib,True
+Mpox_L1R,XYH50751.1,Clade Iia,True
+Mpox_L1R,XYH50710.1,Clade Iia,True
+Mpox_L1R,XYH50576.1,Clade Iia,True
+Mpox_L1R,XYH50535.1,Clade Iia,True
+Mpox_L1R,XYH80326.1,Clade Iia,True
+Mpox_L1R,XYH80285.1,Clade Iia,True
+Mpox_L1R,XVJ44734.1,Clade Iib,True
+Mpox_L1R,XVJ44693.1,Clade Iib,True
+Mpox_L1R,XVJ44556.1,Clade Iib,True
+Mpox_L1R,XVJ44515.1,Clade Iib,True
+Mpox_L1R,XVJ44378.1,Clade Iib,True
+Mpox_L1R,XVJ44337.1,Clade Iib,True
+Mpox_L1R,XVJ44200.1,Clade Iib,True
+Mpox_L1R,XVJ44159.1,Clade Iib,True
+Mpox_L1R,XVJ44022.1,Clade Iib,True
+Mpox_L1R,XVJ43981.1,Clade Iib,True
+Mpox_L1R,XVJ43844.1,Clade Iib,True
+Mpox_L1R,XVJ43803.1,Clade Iib,True
+Mpox_L1R,XVJ43666.1,Clade Iib,True
+Mpox_L1R,XVJ43625.1,Clade Iib,True
+Mpox_L1R,XVJ43488.1,Clade Iib,True
+Mpox_L1R,XVJ43447.1,Clade Iib,True
+Mpox_B5R,QJQ40305.1,Unconfirmed,False
+Mpox_B5R,AGR38725.1,Unconfirmed,False
+Mpox_B5R,AGR38534.1,Unconfirmed,False
+Mpox_B5R,AGR38343.1,Unconfirmed,False
+Mpox_B5R,AGR38152.1,Unconfirmed,False
+Mpox_B5R,AGR37962.1,Unconfirmed,False
+Mpox_B5R,AGR37772.1,Unconfirmed,False
+Mpox_B5R,AGR37582.1,Unconfirmed,False
+Mpox_B5R,AGR37391.1,Unconfirmed,False
+Mpox_B5R,AGR37200.1,Unconfirmed,False
+Mpox_B5R,AGR37009.1,Unconfirmed,False
+Mpox_B5R,AGR36818.1,Unconfirmed,False
+Mpox_B5R,AGR36627.1,Unconfirmed,False
+Mpox_B5R,AGR36436.1,Unconfirmed,False
+Mpox_B5R,AGR36245.1,Unconfirmed,False
+Mpox_B5R,AGR36054.1,Unconfirmed,False
+Mpox_B5R,AGR35863.1,Unconfirmed,False
+Mpox_B5R,AGR35672.1,Unconfirmed,False
+Mpox_B5R,AGR35481.1,Unconfirmed,False
+Mpox_B5R,AGR35290.1,Unconfirmed,False
+Mpox_B5R,AGR35099.1,Unconfirmed,False
+Mpox_B5R,AGR34908.1,Unconfirmed,False
+Mpox_B5R,AGR34717.1,Unconfirmed,False
+Mpox_B5R,AGR34527.1,Unconfirmed,False
+Mpox_B5R,AAL40624.1,Unconfirmed,False
+Mpox_A35R,USS79496.1,Clade II (legacy West African designation),True
+Mpox_A35R,QJQ40286.1,Unconfirmed,False
+Mpox_A35R,AGR38704.1,Unconfirmed,False
+Mpox_A35R,AGR38513.1,Unconfirmed,False
+Mpox_A35R,AGR38322.1,Unconfirmed,False
+Mpox_A35R,AGR38131.1,Unconfirmed,False
+Mpox_A35R,AGR37941.1,Unconfirmed,False
+Mpox_A35R,AGR37751.1,Unconfirmed,False
+Mpox_A35R,AGR37561.1,Unconfirmed,False
+Mpox_A35R,AGR37370.1,Unconfirmed,False
+Mpox_A35R,AGR37179.1,Unconfirmed,False
+Mpox_A35R,AGR36988.1,Unconfirmed,False
+Mpox_A35R,AGR36797.1,Unconfirmed,False
+Mpox_A35R,AGR36606.1,Unconfirmed,False
+Mpox_A35R,AGR36415.1,Unconfirmed,False
+Mpox_A35R,AGR36224.1,Unconfirmed,False
+Mpox_A35R,AGR36033.1,Unconfirmed,False
+Mpox_A35R,AGR35842.1,Unconfirmed,False
+Mpox_A35R,AGR35651.1,Unconfirmed,False
+Mpox_A35R,AGR35460.1,Unconfirmed,False
+Mpox_A35R,AGR35269.1,Unconfirmed,False
+Mpox_A35R,AGR35078.1,Unconfirmed,False
+Mpox_A35R,AGR34887.1,Unconfirmed,False
+Mpox_A35R,AGR34696.1,Unconfirmed,False
+Mpox_A35R,AGR34506.1,Unconfirmed,False
+Mpox_A35R,AAL40603.1,Unconfirmed,False
+Mpox_A35R,AAN78222.1,Unconfirmed,False

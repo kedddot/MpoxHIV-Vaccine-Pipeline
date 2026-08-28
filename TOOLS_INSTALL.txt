@@ -1,0 +1,286 @@
+================================================================================
+MpoxHIV PIPELINE -- COMPLETE TOOL INSTALLATION
+Every external dependency of Phases I, II and III. macOS / Linux, conda-based.
+================================================================================
+
+The pipeline uses FOUR conda environments because the tools have mutually
+incompatible dependencies (Aggrescan3D is Python 2.7; MHCflurry pins numpy 2.x
+while OpenMM/pdbfixer need numpy 1.26). Do not try to merge them.
+
+Scripts locate every binary through an environment variable with a hardcoded
+default (see Section 6). If you install anywhere other than the paths below,
+export the matching variable instead of editing code.
+
+
+================================================================================
+0. IF YOU ARE ON **THIS** MACHINE -- ALREADY RELOCATED TO THE SSD
+================================================================================
+As of 2026-08-28 every dependency below already lives on the external volume
+"Extended SSD". You do not need to install anything. Just run:
+
+    source ~/mpoxhiv_env.sh
+
+before any pipeline step. That sets every path in Section 6 for you. Add the
+line to ~/.zshrc to make it permanent.
+
+  On the SSD now:
+    /Volumes/Extended SSD/phenix-2.2-6143/              14 GB
+    /Volumes/Extended SSD/MpoxHIV_deps/envs/{phase2,mhcpredict,a3d,apbs_env}
+    /Volumes/Extended SSD/MpoxHIV_deps/mhcflurry/       425 MB
+    /Volumes/Extended SSD/MpoxHIV_deps/huggingface/     130 MB
+
+  THE VOLUME NAME CONTAINS A SPACE, AND THAT MATTERS. A shebang line cannot
+  contain a space -- the kernel splits on whitespace, so
+  "#!/Volumes/Extended SSD/.../python3.11" resolves to interpreter
+  "/Volumes/Extended" and every Python entry point fails with
+  "bad interpreter". Compiled binaries (blastp, apbs) are unaffected, which
+  makes this fail in a confusing, partial way.
+
+  The fix in place: ~/mpoxhiv_ssd is a space-free symlink to the volume, and
+  all four conda environments were cloned to paths underneath it. Keep that
+  symlink. If you ever move the envs again, the destination path must contain
+  NO SPACES.
+
+  Sections 1-9 below remain the record of how to rebuild from scratch on a
+  different machine.
+
+================================================================================
+1. THE FOUR CONDA ENVIRONMENTS  -- 4 commands
+================================================================================
+Prerequisite: Miniconda/Anaconda installed at /opt/miniconda3 (or adjust paths).
+
+# --- ENV 1: mhcpredict -- MHC-I/II binding prediction (Phase 1Da, 1F) -------
+conda create -y -n mhcpredict -c conda-forge python=3.11 && \
+  /opt/miniconda3/envs/mhcpredict/bin/pip install \
+    mhcflurry==2.2.1 mhcnuggets==2.4.1 tensorflow numpy pandas torch && \
+  /opt/miniconda3/envs/mhcpredict/bin/mhcflurry-downloads fetch
+
+# --- ENV 2: phase2 -- the main workhorse env (most of Phases 1E, 2, 3) ------
+# Only blast and apbs come from conda here. Everything else is pip -- verified
+# against this env's own conda-meta/history, not assumed. Do NOT try to conda-
+# install openmm/pdbfixer/pdb2pqr; the working env has them from pip and the
+# conda builds pull a different numpy.
+conda create -y -n phase2 -c bioconda -c conda-forge python=3.11 blast apbs && \
+  /opt/miniconda3/envs/phase2/bin/pip install \
+    "numpy==1.26.4" openmm==8.6.0 pdbfixer==1.12.0 pdb2pqr \
+    biopython==1.88 freesasa==2.2.1 pydssp==0.9.1 pandas requests \
+    scikit-learn torch transformers datasets \
+    toxinpred2==1.1 hemopi2==1.3
+
+# --- ENV 3: a3d -- Aggrescan3D standalone, Python 2.7 ONLY (Phase 2C) -------
+# aggrescan3d is NOT on PyPI for py2.7 -- it comes from the lcbio conda channel.
+conda create -y -n a3d -c conda-forge python=2.7 && \
+  /opt/miniconda3/bin/conda install -y -n a3d \
+    -c lcbio -c bioconda -c conda-forge aggrescan3d
+
+# --- ENV 4: apbs_env -- APBS electrostatics (Phase 2C) ----------------------
+conda create -y -n apbs_env -c bioconda -c conda-forge apbs
+
+
+================================================================================
+2. LOCAL BLAST DATABASES  -- 2 commands
+================================================================================
+Both are built from UniProt REST downloads. Run from the project root.
+
+# --- Human Swiss-Prot, for the self-homology screen (Phase 1Ec) ------------
+# ~20,431 reviewed human sequences.
+mkdir -p human_swissprot_db && cd human_swissprot_db && \
+  curl -o human_swissprot.fasta \
+    'https://rest.uniprot.org/uniprotkb/stream?query=reviewed:true+AND+organism_id:9606&format=fasta' && \
+  /opt/miniconda3/envs/phase2/bin/makeblastdb -in human_swissprot.fasta \
+    -dbtype prot -out human_swissprot && cd ..
+
+# --- UniProt Tox-Prot, for the toxicity screen (Phase 1Ea, 2A) -------------
+mkdir -p toxprot_db && cd toxprot_db && \
+  curl -o toxprot.fasta \
+    'https://rest.uniprot.org/uniprotkb/stream?query=reviewed:true+AND+keyword:KW-0800&format=fasta' && \
+  /opt/miniconda3/envs/phase2/bin/makeblastdb -in toxprot.fasta \
+    -dbtype prot -out toxprot && cd ..
+
+
+================================================================================
+3. BigMHC -- IMMUNOGENICITY (Phase 1Dd)  -- 1 command
+================================================================================
+Cloned, not pip-installed. Runs under the phase2 env's python.
+
+mkdir -p external_tools && git clone https://github.com/KarchinLab/bigmhc.git \
+  external_tools/bigmhc
+
+*** DO NOT DELETE external_tools/bigmhc/models/bat*/el/ ***
+Only `-m=im` (immunogenicity) is used, but each bat*/im/ directory contains
+just 4 retrained condenser layers and loads the other 32 from the co-located
+el/ base. Removing el/ silently breaks BigMHC. This is ~2.4 GB and it is
+load-bearing.
+
+
+================================================================================
+4. TOOLS REQUIRING REGISTRATION -- MANUAL DOWNLOAD, NO COMMAND POSSIBLE
+================================================================================
+Both are free for academic use but sit behind a licence form. Neither can be
+scripted.
+
+  PHENIX  (phenix.molprobity -- Phase 2C refinement, Phase 2D validation)
+    https://phenix-online.org/download/
+    Academic registration required. Installed here at:
+      ~/phenix-2.2-6143/phenix_bin/phenix.molprobity
+    Add phenix_bin to PATH, or export MOLPROBITY_BINARY.
+
+  FoldX 5  (Phase 2C folding energy)
+    https://foldxsuite.crg.eu/
+    Academic licence required. Extract into the project root as FoldX5/,
+    keeping rotabase.txt and molecules/ beside the binary -- FoldX will not
+    run without them. Installed here as:
+      FoldX5/foldx5.1_20261231
+
+
+================================================================================
+5. WEB-ONLY TOOLS -- NOTHING TO INSTALL
+================================================================================
+No API and no local package exists for any of these. Each is a manual
+browser submission; the pipeline emits a template and reads the result back.
+
+  AllerTOP v2.0     https://www.ddg-pharmfac.net/AllerTOP        (1Eb, 2A)
+  AllergenFP v1.0   https://ddg-pharmfac.net/AllergenFP          (1Eb, 2A)
+  DeepSol S2        https://machinelearning-protein.qcri.org     (2A, 2C)
+                    free QCAI account required; set model = 2
+  CamSol Intrinsic  .../index.php/camsolintrinsic                (2A)
+  CamSol Structural .../index.php/camsolstrucorr                 (2C)
+                    both at https://www-cohsoftware.ch.cam.ac.uk
+  AlphaFold Server  https://alphafoldserver.com                  (2B)
+                    AlphaFold3 needs a CUDA GPU and will not run on macOS.
+                    Download the WHOLE result folder -- Step 2B reads all 5
+                    ranked models plus every PAE matrix.
+  PSIPRED           https://bioinf.cs.ucl.ac.uk/psipred/         (2B)
+  NetSurfP-3.0      https://services.healthtech.dtu.dk/services/NetSurfP-3.0/
+                    (2B; substitutes RaptorX, which is down -- deviation #16)
+
+Used programmatically, no install, no key:
+  RCSB PDB REST     https://data.rcsb.org        (2B, 3A -- 6NIG, 8WTA)
+  NCBI Entrez       via Biopython                (1A)
+  IEDB Query API    https://query-api.iedb.org   (1H)
+  AFND              allelefrequencies.net        (1F -- values already in code)
+
+Documented but UNREACHABLE:
+  SEMA 2.0          https://sema.airi.net        (1De)
+                    Behind a ServicePipe anti-bot WAF. The OpenAPI schema is
+                    served but every functional endpoint returns a JavaScript
+                    challenge. See deviation #20.
+
+
+================================================================================
+6. ENVIRONMENT VARIABLE OVERRIDES
+================================================================================
+Every path below is the hardcoded default. Export the variable only if you
+installed somewhere else.
+
+  MHCFLURRY_PREDICT_BINARY  /opt/miniconda3/envs/mhcpredict/bin/mhcflurry-predict
+  MHCPREDICT_PYTHON         /opt/miniconda3/envs/mhcpredict/bin/python3
+  BIGMHC_PYTHON             /opt/miniconda3/envs/phase2/bin/python
+  BIGMHC_ROOT               <project>/external_tools/bigmhc
+  BLASTP_BINARY             /opt/miniconda3/envs/phase2/bin/blastp
+  TOXPROT_BLAST_DB          <project>/toxprot_db/toxprot
+  HUMAN_SWISSPROT_DB        <project>/human_swissprot_db/human_swissprot
+  TOXINPRED2_BINARY         /opt/miniconda3/envs/phase2/bin/toxinpred2
+  HEMOPI2_BINARY            /opt/miniconda3/envs/phase2/bin/hemopi2_classification
+  APBS_BINARY               /opt/miniconda3/envs/apbs_env/bin/apbs
+  FOLDX_BINARY              <project>/FoldX5/foldx5.1_20261231
+  MOLPROBITY_BINARY         phenix.molprobity        (expects it on PATH)
+  PHENIX_SECOND_PASS        0    set to 1 for a 2nd Phenix refinement pass
+
+Aggrescan3D is invoked directly as /opt/miniconda3/envs/a3d/bin/aggrescan
+with a generated config.ini -- it has no environment variable.
+
+
+================================================================================
+7. WHICH ENV RUNS WHICH SCRIPT
+================================================================================
+  Phase 1A, 1B, 1C, 1Da, 1Db, 1Dc   mhcpredict
+  Phase 1Dd, 1De, 1Ea, 1Eb, 1Ec     phase2
+  Phase 1F                          mhcpredict  (calls MHCflurry/MHCnuggets)
+  Phase 1G, 1H                      phase2
+  Phase 2A - 2D, Phase 3A           phase2
+  Aggrescan3D (inside 2C)           a3d         (spawned as a subprocess)
+  APBS (inside 2C)                  apbs_env    (spawned as a subprocess)
+
+Example:
+  /opt/miniconda3/envs/phase2/bin/python "Phase 2/STEP D/Phase2D_modelValidation.py"
+
+
+================================================================================
+8. FILES THE PIPELINE USES THAT LIVE **OUTSIDE** THE PROJECT FOLDER
+================================================================================
+Audited 2026-08-28 by grepping every absolute path in the code and then
+checking the filesystem. Copying the Research folder alone is NOT sufficient to
+reproduce this work -- these must exist too. All are recreated by Sections 1-4;
+none contains original research data.
+
+  ~/Library/Application Support/mhcflurry            425 MB   REQUIRED
+      [MOVED 2026-08-28 -> /Volumes/Extended SSD/MpoxHIV_deps/mhcflurry ;
+       MHCFLURRY_DATA_DIR must point at the "4" RELEASE SUBDIRECTORY, not its
+       parent -- verified by running a prediction, the parent path errors with
+       "Missing MHCflurry downloadable file".]
+      MHCflurry's downloaded model weights. NOT bundled with the pip package.
+      Phase 1Da and 1F fail without them.
+      Recreate:  mhcflurry-downloads fetch      (already in Section 1, ENV 1)
+
+  ~/phenix-2.2-6143                                   14 GB   REQUIRED
+      [MOVED 2026-08-28 -> /Volumes/Extended SSD/phenix-2.2-6143. It relocated
+       cleanly: the real dispatchers in bin/ self-resolve. BUT phenix_bin/ is
+       1,434 ABSOLUTE symlinks into the old path and all 1,434 broke on the
+       move -- they were repointed at the new prefix. Verified by a real
+       Step 2D run, not just --help.]
+      Phenix. Provides phenix.molprobity (Step 2D) and the refinement used in
+      Step 2C. Registration-gated; see Section 4. Largest single dependency.
+
+  /opt/miniconda3/envs/mhcpredict                     3.0 GB  REQUIRED
+  /opt/miniconda3/envs/phase2                         3.1 GB  REQUIRED
+  /opt/miniconda3/envs/a3d                            236 MB  REQUIRED
+  /opt/miniconda3/envs/apbs_env                       391 MB  REQUIRED
+      The four environments from Section 1.
+
+  ~/.cache/huggingface/hub                            130 MB  OPTIONAL
+      facebook/esm2_t12_35M_UR50D, the ESM-2 base checkpoint. Needed only to
+      RE-TRAIN the antigenicity classifier. Inference uses the fine-tuned copy
+      that ships inside the project (see below), so a fresh clone does not need
+      this unless train_esm2_antigenicity.py is being re-run.
+
+  /opt/miniconda3/envs/a3d_py2                        789 MB  DELETED 2026-08-28
+      A second Python 2.7 Aggrescan3D environment, unreferenced by any script
+      or config.ini. Superseded by a3d. Safe to delete; left in place only
+      because deleting environments is outside this project's scope.
+
+IN-PROJECT AND EASY TO OVERLOOK -- do not prune these:
+  Phase 1/STEP C/models/esm2_antigenicity_finetuned/   134 MB
+      The fine-tuned ESM-2 antigenicity classifier. Phase 1C silently falls
+      back to Kolaskar-Tongaonkar alone if this directory is missing, so its
+      absence degrades a result rather than raising an error.
+  Phase 1/STEP C/data/benchmark_dataset.csv
+      The 774-sequence training set (390 antigenic / 384 non-antigenic).
+      NOTE: train_esm2_antigenicity.py opens it as the RELATIVE path
+      "data/benchmark_dataset.csv", so that script only works when run with
+      Phase 1/STEP C as the working directory.
+  external_tools/bigmhc/                              2.4 GB
+  human_swissprot_db/ and toxprot_db/                 BLAST indices + sources
+  FoldX5/                                             binary + rotabase.txt + molecules/
+
+NOT dependencies, confirmed:
+  mhcnuggets ships its own model weights inside site-packages (367 files) --
+  nothing external to fetch.
+
+================================================================================
+9. VERIFY THE INSTALL
+================================================================================
+/opt/miniconda3/envs/mhcpredict/bin/mhcflurry-predict --help >/dev/null && echo "OK mhcflurry" ; \
+/opt/miniconda3/envs/phase2/bin/python -c "import Bio,openmm,pdbfixer,freesasa,pydssp;print('OK phase2 libs')" ; \
+/opt/miniconda3/envs/phase2/bin/blastp -version | head -1 ; \
+/opt/miniconda3/envs/phase2/bin/toxinpred2 --help >/dev/null 2>&1 && echo "OK toxinpred2" ; \
+/opt/miniconda3/envs/a3d/bin/aggrescan --help >/dev/null 2>&1 && echo "OK aggrescan3d" ; \
+/opt/miniconda3/envs/apbs_env/bin/apbs --version 2>&1 | head -1 ; \
+phenix.molprobity --help >/dev/null 2>&1 && echo "OK phenix" || echo "MISSING phenix -- add phenix_bin to PATH" ; \
+test -x FoldX5/foldx5.1_20261231 && echo "OK FoldX5" || echo "MISSING FoldX5" ; \
+test -d external_tools/bigmhc/models && echo "OK bigmhc" || echo "MISSING bigmhc" ; \
+test -f human_swissprot_db/human_swissprot.psq && echo "OK human DB" || echo "MISSING human DB" ; \
+test -f toxprot_db/toxprot.psq && echo "OK toxprot DB" || echo "MISSING toxprot DB" ; \
+test -d ~/"Library/Application Support/mhcflurry" && echo "OK mhcflurry models" || echo "MISSING mhcflurry models -- run: mhcflurry-downloads fetch" ; \
+test -d "Phase 1/STEP C/models/esm2_antigenicity_finetuned" && echo "OK ESM-2 classifier" || echo "MISSING ESM-2 -- Phase 1C will silently fall back to Kolaskar-Tongaonkar only"
+================================================================================

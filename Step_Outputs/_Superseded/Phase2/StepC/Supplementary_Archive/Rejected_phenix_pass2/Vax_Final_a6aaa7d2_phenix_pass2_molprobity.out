@@ -1,0 +1,203 @@
+
+=============================== Model properties ==============================
+
+   Number of:
+     all atoms      : 7630
+     H or D atoms   : 3836
+     chains         : 1
+     a.a. residues  : 496
+     nucleotides    : 0
+     water          : 0
+     other (ligands): 0
+   Ligands: None
+
+============================= Geometry restraints =============================
+
+
+                        ----------Bond lengths----------                       
+
+  All restrained atoms within 4.0 sigma of ideal values.
+
+  Min. delta:    0.000 (Z=  0.000)
+  Max. delta:    0.064 (Z=  3.250)
+  Mean delta:    0.009 (Z=  0.426)
+
+                        ----------Bond angles----------                        
+
+  atoms                   ideal    model    delta   sigma  residual   deviation
+   A  81  LEU  C
+   A  82  LYS  N
+   A  82  LYS  CA        121.70   111.65    10.05  1.80e+00  3.12e+01   5.6*sigma
+   A 470  THR  C
+   A 471  LEU  N
+   A 471  LEU  CA        121.70   112.79     8.91  1.80e+00  2.45e+01   4.9*sigma
+   A 471  LEU  CA
+   A 471  LEU  CB
+   A 471  LEU  CG        116.30   132.71   -16.41  3.50e+00  2.20e+01   4.7*sigma
+   A 456  LEU  CA
+   A 456  LEU  CB
+   A 456  LEU  CG        116.30   132.30   -16.00  3.50e+00  2.09e+01   4.6*sigma
+   A 114  LYS  C
+   A 115  GLU  N
+   A 115  GLU  CA        121.70   113.82     7.88  1.80e+00  1.92e+01   4.4*sigma
+   A 465  MET  CA
+   A 465  MET  CB
+   A 465  MET  CG        114.10   122.26    -8.16  2.00e+00  1.67e+01   4.1*sigma
+
+  Min. delta:    0.000 (Z=  0.000)
+  Max. delta:   16.411 (Z=  5.582)
+  Mean delta:    1.397 (Z=  0.628)
+
+                      ----------Dihedral angles----------                      
+
+  atoms                   ideal    model    delta   sigma  residual   deviation
+   A 337  ASN  CA
+   A 337  ASN  C
+   A 338  PHE  N
+   A 338  PHE  CA        180.00   146.32    33.68  5.00e+00  4.54e+01   6.7*sigma
+   A 299  TRP  CA
+   A 299  TRP  C
+   A 300  LEU  N
+   A 300  LEU  CA        180.00  -146.69   -33.31  5.00e+00  4.44e+01   6.7*sigma
+   A  25  PRO  CA
+   A  25  PRO  C
+   A  26  LYS  N
+   A  26  LYS  CA        180.00  -157.33   -22.67  5.00e+00  2.06e+01   4.5*sigma
+   A 292  LYS  CA
+   A 292  LYS  C
+   A 293  SER  N
+   A 293  SER  CA        180.00   158.81    21.19  5.00e+00  1.80e+01   4.2*sigma
+
+  Min. delta:    0.001 (Z=  0.000)
+  Max. delta:   89.814 (Z=  6.735)
+  Mean delta:   18.363 (Z=  1.348)
+
+                       ----------Chiral volumes----------                      
+
+  All restrained atoms within 4.0 sigma of ideal values.
+
+  Min. delta:    0.000
+  Max. delta:    0.236
+  Mean delta:    0.054
+
+                       ----------Planar groups----------                       
+
+  All restrained atoms within 4.0 sigma of ideal values.
+
+  Min. delta:    0.000
+  Max. delta:    0.062
+  Mean delta:    0.007
+
+============================= Hydrogen validation =============================
+
+
+                ----------H/D atoms in the input model----------               
+
+  Total number of hydrogen atoms : 3836
+  Total number of deuterium atoms: 0
+  Number of H atoms (protein)    : 3836
+  Number of D atoms (protein)    : 0
+  Number of H atoms (water)      : 0
+  Number of D atoms (water)      : 0
+  Number of H atoms (other)      : 0
+  Number of D atoms (other)      : 0
+
+                      ----------Water molecules----------                      
+
+  Number of water                            : 0
+  Number of water with 0 H (or D)            : 0
+  Number of water with 1 H (or D)            : 0
+  Number of water with 2 H (or D)            : 0
+  Number of water in alternative conformation: 0
+  Number of water without oxygen atom        : 0
+
+                    ----------MISSING H or D atoms----------                   
+
+  CYS A  11  conformer  : HG 
+  CYS A  18  conformer  : HG 
+  CYS A  23  conformer  : HG 
+  CYS A  33  conformer  : HG 
+  CYS A  40  conformer  : HG 
+  CYS A  41  conformer  : HG 
+  HIS A 167  conformer  : HD1 
+  HIS A 216  conformer  : HD1 
+  HIS A 313  conformer  : HE2 
+  HIS A 401  conformer  : HD1 
+  CYS A 427  conformer  : HG 
+  CYS A 464  conformer  : HG 
+  HIS A 478  conformer  : HE2 
+
+============================ Molprobity validation ============================
+
+
+  Geometry Restraints Library: GeoStd + Monomer Library
+  Deviations from Ideal Values - rmsd, rmsZ for bonds and angles.
+    Bond      :  0.009   0.064   3894  Z= 0.426
+    Angle     :  1.397  16.411   5289  Z= 0.628
+    Chirality :  0.054   0.236    571
+    Planarity :  0.007   0.062    680
+    Dihedral  : 18.363  89.814   1459
+    Min Nonbonded Distance : 2.446
+  
+  Molprobity Statistics.
+    All-atom Clashscore : 25.82
+    Ramachandran Plot:
+      Outliers :  5.47 %
+      Allowed  : 24.70 %
+      Favored  : 69.84 %
+    Rotamer:
+      Outliers : 11.47 %
+      Allowed  : 26.18 %
+      Favored  : 62.34 %
+    Cbeta Deviations :  0.00 %
+    Peptide Plane:
+      Cis-proline     : 0.00 %
+      Cis-general     : 0.22 %
+      Twisted Proline : 0.00 %
+      Twisted General : 0.44 %
+  
+  Rama-Z values with (uncertainties):
+  Interpretation: poor |Rama-Z| > 3; suspicious 2 < |Rama-Z| < 3; good |Rama-Z| < 2.
+  Scores below are scaled independently, so they are not related in a simple way.
+    whole: -6.22 (0.27), residues: 494
+    helix: -2.92 (0.43), residues: 96
+    sheet: -3.95 (0.71), residues: 32
+    loop : -4.94 (0.22), residues: 366
+  
+  Max deviation from planes:
+     Type  MaxDev  MeanDev LineInFile
+   ARG   0.004   0.001   ARG A  43 
+   TYR   0.016   0.002   TYR A  99 
+   PHE   0.032   0.003   PHE A 117 
+   TRP   0.027   0.004   TRP A 299 
+   HIS   0.010   0.003   HIS A 478 
+  
+  
+  
+  Details of bonding type rmsd/Z
+    covalent geometry    : bond        0.00904 /  0.43 ( 3890)
+    covalent geometry    : angle       1.39702 /  0.63 ( 5281)
+    SS BOND              : bond        0.00922 /  0.45 (    4)
+    SS BOND              : angle       1.09892 /  0.50 (    8)
+
+                     ----------Asn/Gln/His flips----------                     
+
+   A  79  GLN
+   A 216  HIS
+   A 313  HIS
+   A 341  ASN
+   A 352  ASN
+   A 373  GLN
+   A 380  ASN
+   A 406  ASN
+
+=================================== Summary ===================================
+
+  Ramachandran outliers =   5.47 %
+                favored =  69.84 %
+  Rotamer outliers      =  11.47 %
+  C-beta deviations     =     0
+  Clashscore            =  25.82
+  RMS(bonds)            =   0.0090
+  RMS(angles)           =   1.40
+  MolProbity score      =   3.55

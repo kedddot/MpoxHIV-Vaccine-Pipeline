@@ -1,0 +1,31 @@
+HOW TO FILL IN manual_sequence_tool_results.json
+====================================================
+Construct: Vax_Final_9b0a55f4  (593 aa)
+Source file: Step_Outputs/Phase1G/Phase1G_FinalConstruct_2026-08-23_1453.fasta
+
+THE SEQUENCE TO PASTE (one block, no line breaks):
+----------------------------------------------------
+GIINTLQKYYCRVRGGRCAVLSCLPKEEQIGKCSTRGRKCCRRKKEAAAKKPCVKLTPLAAYKPVVSTQLLAAYFLGAAGSTMAAYMIVGGLIGLAAYGPKEPFRDYAAYSEGATPQDLAAYTSVFSATVYAAYSMVISLLSMAAYMRYGRHPSFAAYSESESYNELAAYFIDSYLQKLAAYKEFKTLYNLGPGPGTHGIKPVVSTQLLLNGPGPGQCTHGIKPVVSTQLLGPGPGPIPIHYCTPAGYAILGPGPGSGIVQQQSNLLRAIEGPGPGYKRWIILGLNKIVRMGPGPGVIPMFSALSEGATPQGPGPGAITDSAVAVAAASSTGPGPGAAITDSAVAVAAASSGPGPGNELIKILLNNGSDVDGPGPGIIMDILLSKRPSLKIGPGPGIDSYLQKLAQHSIPTGPGPGDSYLQKLAQHSIPTNKKLTVWGIKQLQARVLAVKKEPFRDYVDRFYKTLRAKKGPKEPFRDYVDRFYKTKKAAITDSAVAVAAASSTKKCAAESSTLPNKSDVLTKKACMTDYDTLIDVQSLHKKASIRYRQRLISLLSKKKKAEVNNIIDIQKLNIGEKKAYAEVNNIIDIQKLNI
+----------------------------------------------------
+
+WHERE TO SUBMIT
+1. AllerTOP    -> https://ddg-pharmfac.net/AllerTOP/
+2. AllergenFP  -> https://ddg-pharmfac.net/AllergenFP/
+   (593 aa is well above AllergenFP's minimum length, unlike the short
+   Phase 1 peptides -- no length issue this time)
+3. DeepSol S2  -> web tool, search "DeepSol S2 solubility predictor"
+4. CamSol      -> https://camsolbiologics.com/ (sequence-mode CamSol Intrinsic)
+
+Paste the exact block above into each tool's sequence box and submit.
+
+WHAT TO DO WITH EACH RESULT
+----------------------------
+Open: Step_Outputs/Phase2/StepA/manual_sequence_tool_results.json
+Find the key: "Vax_Final_9b0a55f4_length=593"
+Fill in its four null fields:
+
+  "allertop_is_allergen"      -> true if AllerTOP says Probable Allergen,
+                                  false if Probable Non-Allergen
+  "allergenfp_is_allergen"    -> true if AllergenFP says Allergen,
+                                  false if Non-Allergen
+  "deepsol_

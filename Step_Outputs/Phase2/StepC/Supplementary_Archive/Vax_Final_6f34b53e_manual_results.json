@@ -1,0 +1,13 @@
+{
+  "aggrescan3d_max_patch_length": 16,
+  "aggrescan3d_patch_residue_range": [
+    230,
+    245
+  ],
+  "camsol_structural_max_patch_length": 7,
+  "camsol_structural_patch_residue_range": [
+    560,
+    566
+  ],
+  "deepsol_probability": 0.4443739
+}

@@ -1,0 +1,174 @@
+================================================================================
+ARCHIVED ITEMS -- WHAT IS KEPT, WHERE, AND WHY
+MpoxHIV multi-epitope vaccine pipeline   |   Compiled 2026-08-28
+================================================================================
+
+Nothing that was ever a result has been deleted. Two archives sit under
+Step_Outputs/, and they hold DIFFERENT KINDS OF THING. Do not merge them.
+
+  _Baseline_2026-08-28_PreConsensusRule/   221 files,  72 MB
+      A COMPLETE, INTERNALLY CONSISTENT RESULT SET produced by a DIFFERENT
+      METHOD. Kept so the two methods can be compared and so every number
+      already written into the manuscript stays reproducible.
+
+  _Superseded/                             121 files,  72 MB
+      Outputs REPLACED BY A NEWER RUN OF THE SAME METHOD. Ordinary pipeline
+      history; nothing here represents a different methodological choice.
+
+Both mirror their original locations under Step_Outputs/, so ANY entry can be
+restored by copying it back along the same relative path.
+
+NEITHER IS READ BY THE PIPELINE. Every input selector uses os.listdir() or
+glob.glob() WITHOUT recursion and filters on ".csv"/".fasta"; a directory whose
+name carries no such extension is invisible to all of them. Verified by calling
+each resolver directly after archiving.
+
+
+================================================================================
+1. _Baseline_2026-08-28_PreConsensusRule/     (the 484 aa construct)
+================================================================================
+    Phase1/          105 files    1.7 MB
+    Phase2/          108 files   69.0 MB
+    Phase3/            5 files    1.1 MB
+    _project_docs/     2 files    0.1 MB
+
+WHAT IT IS
+  The full Phase I + II + III result set for Vax_Final_0c83e66a (484 aa), as it
+  stood immediately before Phase 1Eb's allergenicity combination rule was
+  changed from OR to CONSENSUS (deviation #24).
+
+WHY IT WAS KEPT RATHER THAN SUPERSEDED
+  The construct that replaced it was produced by a different decision rule, not
+  a rerun. Under the old rule a peptide was excluded if EITHER AllerTOP OR
+  AllergenFP called it an allergen; measured on the real pool the two disagree
+  on 41 of the 70 peptides where both can run (59%) and agree on ALLERGEN for
+  only 14. That is close to a coin flip being used as a hard filter, and it cost
+  HIV_gp41 every one of its B-cell candidates. Both result sets are therefore
+  legitimate under their own stated rule, and both must remain reproducible.
+
+STATE OF THAT CONSTRUCT
+  Vax_Final_0c83e66a, 484 aa | 12 MHC-I, 11 MHC-II, 4 B-cell | 3/7 antigens
+    with B-cell coverage
+  2A  REVIEW    DeepSol 0.4131329 sole failing criterion
+  2C  REVIEW    Aggrescan3D 16 aa @ 218-233; CamSol structural 6 aa @ 322-327
+  2D  VALIDATED MolProbity 0.64, Ramachandran 98.13% favored
+      DOMAIN_ONLY docking readiness, residues 1-45, pTM 0.17
+  1H  9/27 experimentally confirmed, 12/27 overlapping, 6/27 novel
+  1F  cumulative coverage MHC-I 99.9949%, MHC-II >99.99%; HLA-A 57.10%
+
+CONTENTS
+  Phase1/Phase1E/    toxicity, allergenicity (OR rule), self-homology
+  Phase1/Phase1F/    population coverage incl. the cumulative addendum
+  Phase1/Phase1G/    the 484 aa construct + Boundary_Map
+  Phase1/Phase1H/    IEDB corroboration (3 iterations; the IEDB download cache
+                     under _tool_runs/ was deliberately NOT copied -- it is
+                     source data, not a result, and is reused in place so a
+                     rerun does not re-download 19k records)
+  Phase2/            2A-2D including AlphaFold_Raw/fold_0c83e66a_08_27 (all 5
+                     ranked models + PAE matrices) and Supplementary_Archive
+  Phase3/            prepared HADDOCK receptor + ligand inputs
+  _project_docs/     Phase_I_II_Methods_Status.csv and
+                     Methods_Deviations_RRL_Support.txt as they stood that day
+
+ALSO MOVED HERE ON 2026-08-28 (live copies deleted, 18 files + 3 directories)
+  Live duplicates of the pre-consensus run were removed only after each was
+  byte-compared against its copy here:
+    Phase1Eb / Phase1Ec Raw + Filtered      2026-08-26_1857
+    Phase1F Raw + Filtered                  20260826_1900
+    Phase1G construct CSV + FASTA           2026-08-26_1906
+    Phase1H IEDB reports                    0550, 0608, 0610
+    Step2A Raw + Filtered                   20260827_1555
+    Step2C solubility reports               20260827_1621, 20260828_0457
+    Step2D validation reports               20260827_1621, 0455, 0500
+    Aggrescan3D_Local_0c83e66a/             (directory)
+    CamSol_Structural_0c83e66a/             (directory)
+    AlphaFold_Raw/fold_0c83e66a_08_27/      (directory)
+    all Supplementary_Archive *0c83e66a* files
+
+
+================================================================================
+2. _Superseded/                                (ordinary pipeline history)
+================================================================================
+    Phase1/           51 files   22.8 MB
+    Phase2/           68 files   49.5 MB
+    CandidateB_lowGRAVY_393aa.fasta
+
+WHAT IT IS
+  Outputs replaced by a newer run of the SAME method. Created 2026-08-27 when
+  86 items were consolidated out of the live tree.
+
+CONTENTS
+  Phase1/Phase1D/    superseded 1Db runs (the retained _1852 copy is the
+                     post-SEMA one; _1851 was post-BigMHC only and archiving
+                     the wrong one would have silently dropped columns) and
+                     superseded 1Dc conservancy benchmark runs
+  Phase1/Phase1E/    superseded 1Ea/1Eb/1Ec runs, plus the TOP-5-era manual
+                     allergenicity cache, replaced by the TOP-10 cache
+  Phase1/Phase1F/    superseded coverage runs
+  Phase1/Phase1G/    the superseded 496 aa construct Vax_Final_a6aaa7d2 and
+                     earlier candidates
+  Phase2/            raw AF3 download, NetSurfP and PSIPRED submissions and
+                     Supplementary_Archive entries for a6aaa7d2; the rejected
+                     Phenix 2nd-pass refinement (pass1 was kept instead)
+  CandidateB_lowGRAVY_393aa.fasta
+                     a DeepSol length-lever experiment (393 aa scored 0.393,
+                     WORSE than the longer construct) -- evidence for deviation
+                     #15 that shortening does not fix solubility. Not a
+                     pipeline output.
+
+
+================================================================================
+3. DELETED OUTRIGHT ON 2026-08-28 -- NOT ARCHIVED, AND WHY THAT IS SAFE
+================================================================================
+  RESULTS/                    52 MB. The raw manual downloads for the 566 aa
+                              construct (AlphaFold folder, PSIPRED, NetSurfP,
+                              CamSol Structural). Every file was byte-compared
+                              against its imported copy before deletion and all
+                              were IDENTICAL. The AlphaFold download survives
+                              in full at Phase2/StepB/AlphaFold_Raw/fold_last_try/,
+                              PSIPRED and NetSurfP at StepB/Secondary_Structure/,
+                              CamSol at StepC/CamSol_Structural_6f34b53e/.
+  .DS_Store  (28)             macOS Finder metadata.
+  __pycache__/ (7 dirs)       Python bytecode; regenerated on demand.
+  *.pyc  (12)                 same.
+
+NOTHING ELSE WAS DELETED. No result, log, report, structure or tool output was
+removed without an identical copy being confirmed elsewhere first.
+
+
+================================================================================
+4. LIVE TREE AFTER REORGANISATION
+================================================================================
+Phase I outputs previously sat loose at the top of Step_Outputs/ while Phase II
+and III had their own folders. All three are now grouped consistently:
+
+  Step_Outputs/
+    Phase1/     Phase1A .. Phase1H          <-- moved 2026-08-28
+    Phase2/     StepA .. StepD
+    Phase3/     StepA
+    _Baseline_2026-08-28_PreConsensusRule/
+    _Superseded/
+
+Both archives were restructured the same way so their "paths mirror the
+original location" guarantee still holds.
+
+39 hardcoded path references across 15 scripts were updated in the same change
+(`"Step_Outputs", "Phase1X"` -> `"Step_Outputs", "Phase1", "Phase1X"`). Verified
+afterwards by re-running Phase 3A, the Phase 1F cumulative-coverage addendum and
+Phase 1H end to end: all three reproduced their previous results exactly.
+
+
+================================================================================
+5. RESTORING FROM AN ARCHIVE
+================================================================================
+Paths mirror the live tree, so restoration is a copy back along the same
+relative path. To return to the 484 aa construct:
+
+  cp -R "Step_Outputs/_Baseline_2026-08-28_PreConsensusRule/Phase1/Phase1G/." \
+        "Step_Outputs/Phase1/Phase1G/"
+
+and likewise for Phase1E, Phase1F, Phase2, Phase3. Because every step selects
+its input by newest timestamp, restoring a file older than the current one will
+NOT change what the pipeline picks up -- move or delete the newer file as well
+if a genuine rollback is intended.
+================================================================================

@@ -1,0 +1,2 @@
+Variant,Structure_File,MolProbity_Score,MolProbity_Clashscore,MolProbity_Poor_Rotamers_Pct,Rama_Favored,Rama_Allowed,Rama_Outlier,MP_Quality,Rama_Label,Rama_Meets_Target,Overall_Status,Secondary_QC_Flags,Manual_Results_File
+Vax_Final_0c83e66a length=484,../StepC/Supplementary_Archive/Vax_Final_0c83e66a_phenix_pass1.pdb,0.64,0.4,0.0,98.55,1.04,0.41,EXCELLENT,EXCEEDS TARGET (>98%),True,VALIDATED,None,Vax_Final_0c83e66a_pass1_manual_results.json

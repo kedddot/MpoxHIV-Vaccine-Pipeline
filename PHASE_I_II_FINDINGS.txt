@@ -1,0 +1,470 @@
+================================================================================
+MpoxHIV MULTI-EPITOPE CHIMERIC VACCINE
+FINDINGS OF PHASE I (EPITOPE SELECTION) AND PHASE II (STRUCTURAL VERIFICATION)
+Construct: Vax_Final_6f34b53e (566 aa)   |   Compiled 2026-08-28
+================================================================================
+
+Target pathogens : HIV-1 CRF01_AE and Monkeypox virus (Mpox) Clade II
+Source antigens  : HIV gp120, gp41, p17, p24; Mpox A35R, B5R, L1R (7 total)
+
+COMPANION FILES
+  PAPER_UPDATES_NEEDED.txt        every change not yet in the manuscript,
+                                  mapped to the paper section that needs editing
+  Methods_Deviations_RRL_Support.txt   25 numbered deviations with full
+                                  reasoning and citations
+  Phase_I_II_Methods_Status.csv   per-step execution status and outputs
+  TOOLS_INSTALL.txt               complete dependency install procedure
+  ARCHIVED_ITEMS.txt              what is archived where, and why
+
+
+--------------------------------------------------------------------------------
+1. SUMMARY OF OUTCOME
+--------------------------------------------------------------------------------
+A 566-residue chimeric construct was assembled and passed every stereochemical
+criterion the methodology defines. It carries a REVIEW verdict at two steps, on
+a single underlying issue (predicted solubility), and its AlphaFold model is
+confidently determined only over the adjuvant domain.
+
+  Phase 2A  physicochemical / toxicity / allergenicity    REVIEW
+  Phase 2B  secondary + tertiary structure                COMPLETE
+  Phase 2C  solubility + aggregation                      REVIEW
+  Phase 2D  stereochemistry (MolProbity)                  VALIDATED
+  Phase 2D  fold confidence -> Phase III docking scope     DOMAIN_ONLY (res 1-45)
+
+NOTHING WAS REJECTED. There are no rejection reasons at any step.
+
+
+--------------------------------------------------------------------------------
+2. PHASE I -- EPITOPE SELECTION FUNNEL
+--------------------------------------------------------------------------------
+  1A  Sequence retrieval (NCBI)                    202 sequences / 7 antigens
+      A35R (27) and B5R (25) fall short of 30 because NCBI holds no more
+      non-redundant Clade II records -- a data limit, not a filter artefact.
+
+  1B  Stability (Biopython ProtParam)              202 -> 167 carried
+      75 STABLE, 92 UNSTABLE_FLAGGED (retained, advisory only), 35 excluded for
+      non-standard residues. Source-protein instability flags rather than
+      filters; the short peptides actually used are re-checked at 2A.
+
+  1C  Antigenicity (Kolaskar-Tongaonkar + ESM-2)   167 -> 167 ANTIGENIC
+      Zero disagreements between the two methods. Reported as a consistency
+      check, not a discriminating filter -- all 7 antigens are known immunogens,
+      so a 100% pass rate is the expected result.
+
+  1Da Epitope prediction                           311,338 epitopes
+      MHCflurry (MHC-I), MHCnuggets (MHC-II, 21 alleles across DRB1/DQ/DP),
+      BepiPred-2.0 (B-cell).
+
+  1Db Filtration (top 1% percentile rank)          38,786
+      B-cell 18,805 | MHC-II 14,445 | MHC-I 5,536
+
+  1Dc Conservancy benchmarking                     4,140 at >=20%
+                                                   1,922 at >=50%
+                                                     954 at 100%
+
+  1Dd Immunogenicity (BigMHC IM)                   4,978 allele/peptide pairs
+      408 PRIORITIZED, 5,128 DEPRIORITIZED. Prioritization only; nothing
+      excluded, per the manuscript's "not automatically excluded" wording.
+
+  1De Conformational B-cell (SEMA 2.0)             UNSCREENED (all 7 antigens)
+      The service is behind an anti-bot WAF. Annotation gap only, with zero
+      effect on the shipped sequence -- see Section 6.
+
+  1Ea Toxicity (ToxinPred2 + Tox-Prot BLAST +
+      MERCI motifs)                                210 prioritized, ALL NON-TOXIC
+      Zero real toxin matches once evidence was required rather than a raw score.
+
+  1Eb Allergenicity (AllerTOP + AllergenFP)        210 -> 139 NON-ALLERGEN
+      Exclusion requires the two predictors to AGREE (see Section 6).
+
+  1Ec Human self-homology (BLASTP vs Swiss-Prot)   139 -> 139, all NONE
+      No autoimmune-mimicry liability in any candidate.
+
+  1F  Population coverage (AFND allele freqs)      139 candidates scored
+      >=90% PRIORITIZED: MHC-I 5, MHC-II 12. Below-target peptides retained and
+      ranked lower, never deleted.
+
+  1G  Construction                                 Vax_Final_6f34b53e, 566 aa
+
+  1H  IEDB experimental corroboration              26/32 epitopes (81%)
+
+
+--------------------------------------------------------------------------------
+3. THE CONSTRUCT
+--------------------------------------------------------------------------------
+Architecture (N -> C):
+  human beta-defensin-3 adjuvant (1-45)
+  EAAAK linker (46-50)
+  13 MHC-I epitopes, AAY-joined (51-204)
+  10 MHC-II epitopes, GPGPG-joined (205-404)
+   9 B-cell epitopes, KK-joined (405-566)
+
+Physicochemical:
+  Length 566 aa | MW ~52 kDa class | Instability index 39.23 (stable, <40)
+  GRAVY -0.3219 (hydrophilic) | Theoretical pI 9.70 | Net charge approx +40
+  Bad hydrophobic windows 0 | Spurious linker motifs 0 | Junction-Cys violations 0
+
+Antigen representation (32 epitopes):
+  HIV_p24 7 | Mpox_A35R 6 | Mpox_B5R 6 | Mpox_L1R 6 | HIV_gp41 5 | HIV_gp120 2
+  HIV_p17 contributes no UNIQUE epitope -- its two are shared with p24, both
+  being domains of the same Gag polyprotein. State this rather than claiming
+  seven independently represented antigens.
+
+Conservancy: 17 of 32 epitopes at 100% conservancy across their source variants;
+none below 51.7%.
+
+
+--------------------------------------------------------------------------------
+4. POPULATION COVERAGE
+--------------------------------------------------------------------------------
+Per-epitope coverage is the manuscript's >=90% prioritization criterion and is
+NOT the vaccine's coverage. A recipient is covered if ANY epitope binds one of
+their alleles, so the correct figure is computed over the UNION of binding
+alleles across the construct.
+
+  CUMULATIVE MHC-I    >99.99%   (union of 65 alleles across 13 epitopes)
+  CUMULATIVE MHC-II   >99.99%   (union of 32 alleles across 10 epitopes)
+  COMBINED            >99.99%
+
+PER-LOCUS BREAKDOWN -- REPORT THIS ALONGSIDE THE COMBINED FIGURE:
+  HLA-A     72.75%   (16/22 alleles bound)   <-- weakest locus
+  HLA-B     97.04%   (31/33)
+  HLA-C     99.64%   (18/19)
+  HLA-DPB1  86.97%   (8/8)
+  HLA-DQB1  95.25%   (6/7)
+  HLA-DRB1  99.54%   (18/18)
+
+The across-loci formula multiplies complements, so three loci above ~85% force
+the combined value over 99.9% almost regardless of the rest. Quoted alone the
+combined number is nearly uninformative and reads as overreach. HLA-A at 72.75%
+is the honest headline. No locus saturates, so the figure is not an artefact.
+
+THIS IS SOUTHEAST ASIAN (AUSTRONESIAN) PROXY COVERAGE, NOT PHILIPPINE.
+Allele frequencies come from AFND, population "Singapore Riau Malay"
+(pop_id 2042, n=132, 107 alleles across all six loci). AFND's Philippine
+National Capital Region table is 1-field only (A*02, not A*02:01) and HLA-DQB1
+and HLA-DPB1 have no Philippine data at any resolution. Cite AFND
+(Gonzalez-Galarza et al., Nucleic Acids Research 2020, 48:D783-8), not IEDB.
+
+
+--------------------------------------------------------------------------------
+5. EXPERIMENTAL CORROBORATION (IEDB)
+--------------------------------------------------------------------------------
+All epitopes here are computationally predicted. Cross-referencing the final 32
+against IEDB's curated assay records establishes which also have published
+laboratory support.
+
+  10  EXPERIMENTALLY CONFIRMED (exact match or contained within a curated
+      epitope, with assay data attached)
+  16  OVERLAP a curated epitope by >=8 aa
+   6  NOVEL -- no curated match
+  ----
+  26/32 (81%) corroborated
+
+Assay classes represented: MHC-ligand elution mass spectrometry, T-cell assays,
+B-cell assays. Species split: 12 same-species, 14 cross-species orthopoxvirus
+(vaccinia) orthologs.
+
+TWO QUALIFICATIONS THAT MUST TRAVEL WITH THIS NUMBER:
+(a) Vaccinia matches are CROSS-SPECIES. IEDB holds 29 Monkeypox-virus epitopes
+    versus 17,903 vaccinia ones, and A35R/B5R/L1R have direct vaccinia
+    orthologs -- orthopoxvirus cross-reactivity is the mechanism by which
+    smallpox vaccination protects against mpox. Excluding them would discard
+    nearly the entire relevant experimental record, but they must be labelled.
+(b) Every match was verified against our own Phase 1A reference antigens
+    (83-100% identity, zero rejected). This matters because a 9-mer can match
+    by chance in a ~200 kb poxvirus proteome, and because UniProt's names for
+    orthopoxvirus genes ("Ankyrin repeat protein OPG189") bear no resemblance
+    to ours ("B5R"), so a name-based check would have rejected real orthologs.
+
+NOVEL IS NOT A DEFECT. Predicting epitopes with no prior curation is the point
+of a prediction pipeline. This analysis distinguishes the two; it did not rank
+them, and it changed no selection.
+
+
+--------------------------------------------------------------------------------
+6. PHASE II RESULTS
+--------------------------------------------------------------------------------
+2A -- PHYSICOCHEMICAL, TOXICITY, ALLERGENICITY          VERDICT: REVIEW
+  AllerTOP NON-ALLERGEN | AllergenFP NON-ALLERGEN
+  CamSol intrinsic solubility score 0.865041
+  DeepSol S2 solubility probability 0.4443739  <-- the sole failing criterion
+  ToxinPred2, HemoPI2, BLASTP vs Tox-Prot: pass
+  Junction screen over 3,943 unique junction-spanning peptides: pass
+  Every other Sec. II.A check passes.
+
+2B -- SECONDARY AND TERTIARY STRUCTURE                  COMPLETE
+  PSIPRED      47.88% helix / 5.12% sheet / 47.00% coil
+  NetSurfP-3.0 25.80% / 4.06% / 70.14%
+  AlphaFold3 (5 ranked models) -- see Section 7.
+
+2C -- SOLUBILITY AND AGGREGATION                        VERDICT: REVIEW
+  DeepSol 0.4443739 (<0.50)
+  Aggrescan3D max patch  16 aa, residues 230-245, mean pLDDT 22.0
+  CamSol structural patch 7 aa, residues 560-566, mean pLDDT 21.9
+  Hydrophobic fraction 0.409 | Exposed hydrophobic area 649.3 A^2
+  FoldX total folding energy 565.42 kcal/mol (contextual; NOT a ddG -- there
+  are no designed mutants in this study)
+
+2D -- STEREOCHEMISTRY                                   VERDICT: VALIDATED
+  MolProbity score 0.90 (EXCELLENT, 100th percentile) | Clashscore 0.68
+  (99th percentile) | Poor rotamers 1.08%
+  Ramachandran 97.16% favored / 2.48% allowed / 0.35% outliers
+  Rama distribution Z-score -0.04 +/- 0.34 | Cbeta deviations 0.00%
+  Bad bonds 0/4468 | Bad angles 0/6052 | Chiral volume outliers 0/653
+  No secondary QC flags.
+
+  THE FULL MolProbity WEB REPORT IS REDDER THAN THE SCORE SUGGESTS, AND THAT
+  MATTERS. Four criteria fall outside their goals:
+      Favored rotamers      91.54%   goal >98%
+      Cis nonProlines       0.39%    goal <0.05%   (2 of 518)
+      CA Geometry outliers  2.31%    goal <0.5%    (13 residues)
+      CaBLAM outliers       3.2%     goal <1.0%    (18 residues)
+  The MolProbity SCORE is computed from only clashscore, rotamer outliers and
+  Ramachandran outliers, and applies tolerances to the latter two. CaBLAM, CA
+  geometry and cis-peptides are NOT in the formula, which is why 0.90 does not
+  reflect them.
+  The pattern is the finding: everything Phenix RESTRAINS during refinement is
+  perfect (bonds, angles, Cbeta, clashscore), while everything describing
+  whether the backbone is in a BELIEVABLE CONFORMATION is poor. Refinement made
+  the geometry ideal without making the fold correct.
+  LOCALISED (molprobity.cablam, mapped onto the pLDDT table): 59 of 62 flagged
+  residues lie OUTSIDE the adjuvant, at mean pLDDT 29.2 (whole model 35.7;
+  adjuvant 91.3). ALL 13 CaBLAM outliers are in the epitope cassettes, zero in
+  the adjuvant; 12 of 13 CA-geometry outliers likewise. They cluster in runs
+  (341-346, 364-369) coinciding with GPGPG linker regions.
+  This is an INDEPENDENT corroboration of Section 7, from criteria built for
+  exactly this case -- CaBLAM is MolProbity's "low-resolution" section,
+  designed for structures whose detailed geometry cannot be trusted.
+  For reference: the superseded 484 aa construct scored MolProbity 0.64 with
+  clashscore 0.40 and 0.00% poor rotamers, so this construct is marginally
+  worse on local geometry while remaining comfortably inside EXCELLENT.
+
+
+--------------------------------------------------------------------------------
+7. FOLD CONFIDENCE -- THE FINDING THAT SETS PHASE III SCOPE
+--------------------------------------------------------------------------------
+MolProbity scores LOCAL STEREOCHEMISTRY. It says nothing about whether the fold
+is correct: a random coil with clean geometry passes every one of its criteria.
+(For reference: the superseded 484 aa construct scored MolProbity 0.64 with
+clashscore 0.40 and 0.00% poor rotamers, so this construct is marginally worse
+on local geometry while remaining comfortably inside the EXCELLENT band.)
+AlphaFold's own confidence output was therefore analysed separately.
+
+                          Adjuvant (1-45)     Epitope cassettes (51-566)
+  Mean pLDDT                   91.3                21.4 - 39.7
+  Residues at pLDDT >= 70      100%                0%
+  Intra-region PAE             2.41 A              22.1 - 29.0 A
+  Cross-model CA RMSD          0.13 A              18.5 - 23.9 A
+  (10 model pairs)
+
+  Whole model: pTM 0.16-0.17 across ALL FIVE ranked models
+               84.6% of residues below pLDDT 50
+               only 46 residues reach pLDDT >= 70, forming ONE contiguous
+               run (1-46) -- exactly the beta-defensin-3 adjuvant
+               inter-region PAE ~31 A against a ~31.75 A ceiling
+
+Docking the whole model would mean docking one arbitrary conformer of a
+~520-residue coil: substituting any other ranked model moves those regions by
+18-24 A, so the result would not reproduce.
+
+THIS IS ARCHITECTURE, NOT A MODELLING FAILURE. Flexible GPGPG/AAY/KK linkers
+are chosen precisely so each epitope stays independently accessible to
+processing machinery; a determined global fold is not the design goal. No
+epitope reselection changes it, and molecular dynamics will not fold ~520 de
+novo residues.
+
+CONSEQUENCE: Phase III docks residues 1-45. This is not a fallback -- human
+beta-defensin-3 IS the TLR-1/2 and TLR-4 agonist, and is the reason the
+adjuvant is in the construct at all. The epitope cassettes have no proposed
+receptor interaction to model. The region AlphaFold determines confidently is
+exactly the region the docking claim depends on.
+
+THRESHOLDS ARE EXTERNAL CONVENTION, NOT MANUSCRIPT CRITERIA: pLDDT >= 70 is
+AlphaFold's own confident band; pTM >= 0.5 the usual global-fold line; cross-
+model RMSD <= 2.0 A the conventional "same structure" agreement. The manuscript
+specifies no fold-confidence criterion at all.
+
+
+--------------------------------------------------------------------------------
+8. HOW TO READ THE REVIEW VERDICTS
+--------------------------------------------------------------------------------
+None of the following rejected the construct, and none is resolvable by a later
+phase. They are limits to disclose, not defects to fix.
+
+(a) DeepSol 0.4444 < 0.50 -- the sole failing criterion at both 2A and 2C.
+    A PREDICTION, not a measurement, and it is contradicted by the other
+    sequence-based predictor used here: CamSol intrinsic scores the same
+    sequence 0.865, comfortably on the soluble side. Two solubility predictors
+    disagree. Only wet-lab expression can settle it; no computational phase can.
+
+(b) Hydrophobic fraction 0.409 (>0.25) and exposed hydrophobic area 649 A^2
+    (>250) -- both computed by SASA over the AlphaFold model. That model is
+    84.6% disordered, so these quantities describe one arbitrary conformer of a
+    coil, not a stable exposed surface. They are a DISORDER signature, not an
+    aggregation signature.
+
+(c) Aggrescan3D patch 16 aa (>8 aa threshold) -- sits at mean pLDDT 22.0, i.e.
+    in a region AlphaFold cannot place. Not confidently corroborated. The
+    CamSol structural patch (7 aa) is under threshold. Both fall in disordered
+    regions, which is the same finding as (b) reached by an independent route.
+
+(d) Surface-charge junction flags (many, mostly at KK junctions) -- the KK
+    linker IS two lysines, so any peptide spanning one is charge-rich by
+    construction. Largely circular; advisory only.
+
+(e) HemoPI2 hemolysis score 0.72 (>=0.50) -- not a rejection under the
+    manuscript's conjunctive rule, which also requires hydrophobic fraction
+    >0.60 (measured 0.401). WORTH STATING PLAINLY ANYWAY: beta-defensin-3 is a
+    natural cationic antimicrobial peptide and is membrane-active by design, so
+    a hemolysis signal is biologically expected from the adjuvant. It is the
+    one flag that would benefit from experimental follow-up.
+
+(f) 571 junction peptides carry composition-only toxicity flags with ZERO BLAST
+    or MERCI evidence -- exactly the false-positive mode that the evidence-based
+    toxicity rule was adopted to suppress. Advisory.
+
+(g) Junction-level allergenicity is not automated (manual submission burden
+    scales with candidate x junction count). A feasibility limitation.
+
+(h) MolProbity's red rows -- favored rotamers 91.54%, cis nonProlines 0.39%,
+    CA geometry outliers 2.31%, CaBLAM outliers 3.2%. Not blockers and not
+    fixable by further refinement: 59 of 62 flagged residues sit in regions
+    AlphaFold cannot place (mean pLDDT 29.2). They are the same disorder
+    finding as (b) and (c), reached by a fourth independent route.
+
+
+--------------------------------------------------------------------------------
+9. KNOWN GAPS -- STATE THESE, DO NOT LET A REVIEWER FIND THEM
+--------------------------------------------------------------------------------
+(1) HIV_gp41 contributes ZERO B-cell epitopes. Its MPER region carries the
+    best-characterised broadly neutralising antibody epitopes in HIV, so this
+    is a real gap. Cause is now known precisely: gp41's entire surviving B-cell
+    pool consists of overlapping windows of ONE region (SLKPCVKLTP), every one
+    of which is blocked by cross-class frame deduplication against gp41's own
+    selected epitopes KPCVKLTPL, SLWDQSLKP (MHC-I) and PIPIHYCTPAGYAIL (MHC-II).
+    Frame deduplication is CORRECT behaviour -- it prevents counting one
+    antigenic region twice. The underlying limitation is that the TOP-10
+    per-antigen shortlist has no diversity requirement: gp41 spent ten slots on
+    two regions while Mpox_B5R's ten covered nine. Fixing this requires
+    frame-diversified shortlisting plus roughly 50-100 additional manual
+    allergenicity submissions, and was not done.
+
+(2) HIV_p17 contributes no unique epitope (shared with p24; both Gag domains).
+
+(3) SEMA 2.0 conformational B-cell screening never ran -- the service sits
+    behind a commercial anti-bot WAF (re-verified endpoint by endpoint on
+    2026-08-28: the OpenAPI schema is served, but every functional endpoint
+    returns a JavaScript challenge). This is an annotation gap with ZERO effect
+    on the shipped sequence, because frame deduplication rather than priority
+    determines every B-cell slot -- no SEMA score could have arbitrated any
+    choice made here.
+
+(4) The global fold is undetermined (Section 7). Phase III is scoped to
+    residues 1-45 accordingly.
+
+(5) Predicted solubility is unresolved and the two predictors disagree
+    (Section 8a).
+
+
+--------------------------------------------------------------------------------
+10. ANSWERS TO THE PAPER'S RESEARCH QUESTIONS 1-3
+--------------------------------------------------------------------------------
+RQ1 -- which epitopes satisfy antigenicity, conservancy, population coverage,
+non-toxicity and non-allergenicity?
+  32 epitopes: 13 MHC-I, 10 MHC-II, 9 B-cell, across 6 uniquely represented
+  source antigens (HIV_p24 7, Mpox_A35R 6, Mpox_B5R 6, Mpox_L1R 6, HIV_gp41 5,
+  HIV_gp120 2; HIV_p17 contributes no unique epitope). All 32 are NON-TOXIC and
+  NON-ALLERGEN, and all show no human self-homology. 17 of 32 are at 100%
+  conservancy; none below 51.7%. Cumulative population coverage exceeds 99.99%
+  for both MHC classes (per-locus figures in Section 4). 26 of 32 additionally
+  carry curated experimental support in IEDB (Section 5).
+
+RQ2 -- what architecture ensures a stable construct with favorable folding?
+  beta-defensin-3 + EAAAK + 13 MHC-I (AAY) + 10 MHC-II (GPGPG) + 9 B-cell (KK),
+  566 aa. Instability index 39.23 (stable, threshold 40), GRAVY -0.3219
+  (hydrophilic), pI 9.70 (far from the buffer pH 7.0 exclusion zone), net
+  charge +40. Zero >80% hydrophobic windows, zero spurious linker motifs, zero
+  non-adjuvant junction-cysteine violations. Selected from 6,000
+  selection+ordering trials; 10 of 60 polished candidates reached (0 bad
+  windows, 0 spurious motifs).
+  "FAVORABLE PROTEIN FOLDING" NEEDS QUALIFYING -- see RQ3 and Section 7. The
+  architecture is stable and well-formed at the sequence and local-geometry
+  level; it does not adopt a determined global fold, by design.
+
+RQ3 -- stereochemical quality of the predicted tertiary structure, especially
+Ramachandran-favored regions?
+  97.16% Ramachandran-favored, inside the paper's stated 95-98% target.
+  MolProbity score 0.90, inside the stated 0.5-1.5 EXCELLENT band. 0.35%
+  Ramachandran outliers, 0.68 clashscore.
+  REPORT THE SECOND HALF TOO: the same MolProbity report returns 91.54%
+  favored rotamers (goal >98%), 2.31% CA-geometry outliers (goal <0.5%) and
+  3.2% CaBLAM outliers (goal <1.0%), none of which enter the MolProbity score.
+  Stereochemistry is excellent; the FOLD is undetermined outside residues 1-46.
+  Those are separate claims and Step 2D now reports them as separate verdicts.
+
+
+--------------------------------------------------------------------------------
+11. TOOLS ACTUALLY USED IN PHASES I AND II
+--------------------------------------------------------------------------------
+Differences from the paper's Section II.B are itemised in
+PAPER_UPDATES_NEEDED.txt; this is the executed list.
+
+  Retrieval / screening   NCBI Entrez (Biopython); Kolaskar-Tongaonkar;
+                          fine-tuned ESM-2 (facebook/esm2_t12_35M_UR50D)
+  Epitope prediction      IEDB MHC Tools API (MHC-I <=1% , MHC-II <=10%);
+                          BepiPred-2.0; BigMHC IM; MHCflurry 2.2.1 and
+                          MHCnuggets 2.4.1 (local, for coverage recompute)
+  Conformational B-cell   SEMA 2.0 -- ATTEMPTED, WAF-blocked, all UNSCREENED
+  Safety                  ToxinPred2 1.1; HemoPI2 1.3; BLAST+ 2.16.0 against
+                          local UniProt Tox-Prot and human Swiss-Prot
+                          (20,431 reviewed sequences); AllerTOP v2.0;
+                          AllergenFP v1.0
+  Coverage                AFND allele frequencies, Singapore Riau Malay
+                          (pop_id 2042, n=132, 107 alleles / 6 loci)
+  Corroboration           IEDB Query API (19,193 curated records:
+                          HIV-1 977, Vaccinia 18,187, MPXV 29)
+  Structure               AlphaFold Server (AlphaFold3); PSIPRED;
+                          NetSurfP-3.0 (replaces RaptorX); pydssp
+  Preparation             PDBFixer; OpenMM 8.6; Phenix 2.2 (refinement);
+                          PDB2PQR; APBS 3.4.1
+  Solubility / aggregation  DeepSol S2; CamSol Intrinsic; CamSol Structural;
+                          Aggrescan3D 1.0.1 (local); FreeSASA 2.2.1;
+                          FoldX 5 (local binary)
+  Validation              phenix.molprobity; molprobity.cablam;
+                          Bio.PDB.Superimposer (cross-model RMSD)
+  Phase III prep          RCSB REST API (6NIG, 8WTA entity + _struct_ref_seq)
+
+  Python 3.11 throughout except Aggrescan3D, which requires Python 2.7 and runs
+  in its own environment. Four conda environments are required because the
+  dependencies are mutually incompatible. Full install procedure:
+  TOOLS_INSTALL.txt.
+
+
+--------------------------------------------------------------------------------
+12. READINESS FOR PHASE III
+--------------------------------------------------------------------------------
+READY, with docking scoped to residues 1-45.
+
+Prepared inputs (Phase 3 Step A):
+  Phase3A_TLR2_6NIG_receptor.pdb   chain A, 478 residues (27-507). The VLR-B
+    hagfish crystallisation partner (509-576) and its engineered linker are
+    stripped; the Diprovocim agonist KQD -- which occupies the exact pocket to
+    be docked into -- is removed; 4 NAG glycans retained as a logged decision.
+  Phase3A_TLR4_8WTA_receptor.pdb   chains A+C (TLR4 27-627 + MD-2 19-158,
+    741 residues). MD-2's lipid-A acyl chains are retained deliberately: that
+    pocket is functionally occupied in the activated receptor, and emptying it
+    would present an artificial cavity.
+  Phase3A_Vaccine_ligand.pdb       45 residues (1-45), sliced from the
+    Phenix-refined model that Step 2D validated.
+
+All outputs are legacy PDB because HADDOCK v2.4 does not read mmCIF.
+
+WHAT PHASE III CAN AND CANNOT CLAIM:
+  CAN  -- that the adjuvant domain engages TLR-2 and TLR-4, with a reproducible
+          interface, since that domain is determined across all five ranked
+          models to 0.13 A.
+  CANNOT -- anything about the epitope cassettes' three-dimensional presentation,
+          or a whole-construct binding affinity. Those coordinates are not
+          determined and any such number would not reproduce.
+================================================================================

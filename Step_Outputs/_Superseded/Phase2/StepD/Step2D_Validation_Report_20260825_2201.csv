@@ -1,0 +1,2 @@
+Variant,Structure_File,MolProbity_Score,MolProbity_Clashscore,MolProbity_Poor_Rotamers_Pct,Rama_Favored,Rama_Allowed,Rama_Outlier,MP_Quality,Rama_Label,Rama_Meets_Target,Overall_Status,Secondary_QC_Flags,Manual_Results_File
+Vax_Final_a6aaa7d2 length=496,../StepC/Supplementary_Archive/Vax_Final_a6aaa7d2_phenix_pass1.pdb,1.23,0.52,0.25,89.88,8.91,1.21,EXCELLENT,BELOW TARGET (<95%),False,FAILED - REQUIRES REFINEMENT,"Rama Outliers 1.2% > 0.5% (community default, not methodology-specified)",Vax_Final_a6aaa7d2_pass1_manual_results.json

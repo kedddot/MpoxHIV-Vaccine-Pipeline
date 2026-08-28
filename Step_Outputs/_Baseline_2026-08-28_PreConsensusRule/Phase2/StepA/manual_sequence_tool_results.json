@@ -1,0 +1,62 @@
+{
+  "Vax_Var1_fb3faeb6 | length=138": {
+    "allertop_is_allergen": false,
+    "allergenfp_is_allergen": false,
+    "deepsol_probability": 0.9141357,
+    "camsol_seq_patch_length": 2.420984
+  },
+  "Vax_Var2_fd48d7c6 | length=138": {
+    "allertop_is_allergen": false,
+    "allergenfp_is_allergen": true,
+    "deepsol_probability": 0.98669356,
+    "camsol_seq_patch_length": 2.263713
+  },
+  "Vax_Var3_433c1479 | length=138": {
+    "allertop_is_allergen": true,
+    "allergenfp_is_allergen": false,
+    "deepsol_probability": 0.8389346,
+    "camsol_seq_patch_length": 1.359833
+  },
+  "Vax_Var4_5c527a0f | length=138": {
+    "allertop_is_allergen": false,
+    "allergenfp_is_allergen": false,
+    "deepsol_probability": 0.97088116,
+    "camsol_seq_patch_length": 1.917486
+  },
+  "Vax_Var5_354dce18 | length=138": {
+    "allertop_is_allergen": false,
+    "allergenfp_is_allergen": false,
+    "deepsol_probability": 0.9788033,
+    "camsol_seq_patch_length": 1.97168
+  },
+  "Vax_Final_9b0a55f4_length=593": {
+    "allertop_is_allergen": false,
+    "allergenfp_is_allergen": false,
+    "deepsol_probability": 0.3664494,
+    "camsol_seq_patch_length": 0.279413
+  },
+  "Vax_Final_318e1521_length=494": {
+    "allertop_is_allergen": false,
+    "allergenfp_is_allergen": false,
+    "deepsol_probability": 0.2569403,
+    "camsol_seq_patch_length": -0.037513
+  },
+  "Vax_Final_5f9d727b_length=475": {
+    "allertop_is_allergen": false,
+    "allergenfp_is_allergen": false,
+    "deepsol_probability": 0.44552746,
+    "camsol_seq_patch_length": 0.31066
+  },
+  "Vax_Final_a6aaa7d2": {
+    "allertop_is_allergen": false,
+    "allergenfp_is_allergen": false,
+    "deepsol_probability": 0.4896781,
+    "camsol_seq_patch_length": 0.223449
+  },
+  "Vax_Final_0c83e66a": {
+    "allertop_is_allergen": false,
+    "allergenfp_is_allergen": false,
+    "deepsol_probability": 0.4131329,
+    "camsol_seq_patch_length": 0.579598
+  }
+}
