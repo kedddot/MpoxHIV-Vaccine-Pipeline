@@ -45,7 +45,7 @@ line to ~/.zshrc to make it permanent.
   different machine.
 
 ================================================================================
-1. THE FOUR CONDA ENVIRONMENTS  -- 4 commands
+1. THE FIVE CONDA ENVIRONMENTS  -- 5 commands
 ================================================================================
 Prerequisite: Miniconda/Anaconda installed at /opt/miniconda3 (or adjust paths).
 
@@ -76,6 +76,34 @@ conda create -y -n a3d -c conda-forge python=2.7 && \
 # --- ENV 4: apbs_env -- APBS electrostatics (Phase 2C) ----------------------
 conda create -y -n apbs_env -c bioconda -c conda-forge apbs
 
+
+
+# --- ENV 5: sema_env -- SEMA-3D conformational B-cell prediction (1De) ------
+# NOTE python=3.11, NOT the 3.10 the upstream setup.sh asks for. On macOS 26+
+# the newest scipy available for 3.10 is 1.15.3, whose _propack extension fails
+# to dlopen ("__DATA/__thread_bss has a zero-fill section type"), which breaks
+# scikit-learn. 3.11 gets scipy 1.17+ and works.
+# The upstream environment.yml is linux-64/CUDA-pinned and cannot be used here;
+# torch runs on Apple MPS instead.
+conda create -y -p <ENVS>/sema_env -c conda-forge python=3.11 && \
+  <ENVS>/sema_env/bin/pip install torch "transformers==4.37.2" "tokenizers<0.16" \
+    "biopython==1.81" biotite pandas scikit-learn scipy tqdm fair-esm \
+    biopandas accelerate huggingface_hub "numpy<2"
+
+# foldseek -- REQUIRED by SEMA-3D to emit 3Di structural tokens.
+# The binary vendored at external_tools/SEMAi/saprot_utils/bin/foldseek is a
+# Linux x86-64 ELF and will not run on Apple silicon. Use Homebrew:
+brew install brewsci/bio/foldseek
+
+# SEMA source + model weights (~13 GB for the five SEMA-3D checkpoints,
+# plus ~2.6 GB for the SaProt-650M base model):
+cd external_tools && git clone --depth 1 https://github.com/AIRI-Institute/SEMAi.git
+# The weights host (bioinformatics-kardymon.obs.ru-moscow-1.hc.sbercloud.ru)
+# may fail to resolve on some networks while being perfectly reachable -- it is
+# a local-resolver problem, not a dead host. If so, resolve it explicitly:
+#   curl --resolve "$HOST:443:37.18.122.91" -C - -o models/sema_3d_$i.pth <url>
+# Transfers also stall silently; use --speed-limit/--speed-time plus -C - to
+# resume rather than restarting from zero.
 
 ================================================================================
 2. LOCAL BLAST DATABASES  -- 2 commands
@@ -160,11 +188,12 @@ Used programmatically, no install, no key:
   IEDB Query API    https://query-api.iedb.org   (1H)
   AFND              allelefrequencies.net        (1F -- values already in code)
 
-Documented but UNREACHABLE:
-  SEMA 2.0          https://sema.airi.net        (1De)
+Documented but UNREACHABLE (hosted service only -- SEMA now runs locally):
+  SEMA 2.0 web      https://sema.airi.net        (superseded, see ENV 5)
                     Behind a ServicePipe anti-bot WAF. The OpenAPI schema is
                     served but every functional endpoint returns a JavaScript
-                    challenge. See deviation #20.
+                    challenge. Not used any more: SEMA is open source and runs
+                    locally instead. See deviation #20.
 
 
 ================================================================================

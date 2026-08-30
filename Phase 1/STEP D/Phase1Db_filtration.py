@@ -1,4 +1,4 @@
-import os, sys, time, re, csv, requests
+import os, sys, time, re, csv, json, hashlib, requests
 from datetime import datetime
 from collections import defaultdict
 
@@ -193,19 +193,68 @@ def run_step1db_optimized(mhcii_only=False):
     # the MHC-II pass from 3507 requests (~11.7 h) to 57 (~4 min). Same API,
     # same method, same thresholds -- purely how requests are packed. Fewer
     # requests also means far less exposure to throttle-induced errors.
+    #
+    # PERSISTENT DISK LAYER (added 2026-08-29).
+    # The in-memory cache above dies with the process, so ANY re-run re-queried
+    # all 57 distinct sequences from scratch even when only one antigen had
+    # changed. That matters now: correcting the Mpox antigens (deviation #26)
+    # means re-running this step with ~25 genuinely new sequences and ~32
+    # unchanged ones. Measured against live IEDB, a 21-allele MHC-II call takes
+    # 5.0s on a 181 aa sequence and 24.7s on a 1437 aa one, so the unchanged
+    # sequences are roughly an hour of pure re-fetching for identical answers.
+    #
+    # The key is the SAME tuple as the memory cache -- (endpoint, allele set,
+    # length, sequence) -- so a cached entry can only be reused for a byte-
+    # identical request. Change the allele panel or the method and every key
+    # changes with it, which is what stops a stale panel silently surviving.
+    #
+    # FAILURES ARE NEVER PERSISTED. A None from a timeout or a throttle is kept
+    # in memory for this run only; writing it to disk would turn one transient
+    # IEDB outage into a permanent poisoned cache that silently drops an
+    # antigen from every future run.
+    cache_dir = os.path.join(output_folder, "_tool_runs", "iedb_cache")
+    os.makedirs(cache_dir, exist_ok=True)
+
+    def _cache_path(cache_key):
+        digest = hashlib.sha256(repr(cache_key).encode()).hexdigest()[:32]
+        return os.path.join(cache_dir, f"{cache_key[0]}_{digest}.txt")
+
     response_cache = {}
-    cache_hits = [0]  # mutable counter closed over by cached_post
+    cache_hits = [0]      # in-memory hits
+    disk_hits = [0]       # served from a previous run
+    fetched = [0]         # actually went to IEDB
 
     def cached_post(url, payload, cache_key):
         if cache_key in response_cache:
             cache_hits[0] += 1
             return response_cache[cache_key]
+
+        path = _cache_path(cache_key)
+        if os.path.isfile(path):
+            try:
+                with open(path) as fh:
+                    text = fh.read()
+                response_cache[cache_key] = text
+                disk_hits[0] += 1
+                return text
+            except OSError:
+                pass  # unreadable cache entry -- just refetch
+
         try:
             response = session.post(url, data=payload, timeout=180)
             text = response.text if response.status_code == 200 else None
         except Exception:
             text = None
         response_cache[cache_key] = text
+        fetched[0] += 1
+        if text is not None:
+            tmp = path + ".tmp"
+            try:
+                with open(tmp, "w") as fh:
+                    fh.write(text)
+                os.replace(tmp, path)   # atomic: a killed run leaves no half file
+            except OSError:
+                pass
         return text
 
     # Group input files by their cleaned sequence so each distinct sequence is
@@ -381,6 +430,9 @@ def run_step1db_optimized(mhcii_only=False):
     n_new_mhcii = len(final_results)
     if mhcii_only:
         final_results = carried_rows + final_results
+
+    print(f"[INFO] IEDB requests -- fetched: {fetched[0]} | reused from disk: {disk_hits[0]} "
+          f"| reused in-memory: {cache_hits[0]}  (cache: {cache_dir})")
 
     out_file = os.path.join(output_folder, f"Phase1Db_Elite_{datetime.now().strftime('%Y%m%d_%H%M')}.csv")
     fieldnames = ["Target", "Variant", "Type", "Length", "Peptide", "GRAVY", "GRAVY_Deprioritized", "Percentile_Rank", "mean_BepiPred", "pct_above", "Bcell_Tier", "Binding_Alleles"]

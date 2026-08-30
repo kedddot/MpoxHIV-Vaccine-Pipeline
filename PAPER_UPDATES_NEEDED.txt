@@ -69,15 +69,39 @@ Add these. Every one was actually executed and produced data in the results.
      across all six loci). THIS IS THE SINGLE MOST IMPORTANT WORDING CHANGE IN
      THIS FILE -- see 5.1.
 
-2.3  SEMA 2.0  ->  did not run                              [deviation #20]
-     The service sits behind a commercial anti-bot WAF (ServicePipe).
+2.3  SEMA 2.0  ->  RUN LOCALLY as SEMA-3D; gap CLOSED        [deviation #20]
+     The hosted service sits behind a commercial anti-bot WAF (ServicePipe).
      Re-verified endpoint by endpoint 2026-08-28: the OpenAPI schema is served,
      but POST /proteins and every /proteins/{id}/*_data GET return a JavaScript
      challenge page under a full browser User-Agent, browser headers, a warmed
-     session and cookie replay. All 7 antigens are recorded UNSCREENED.
-     ZERO EFFECT ON THE SHIPPED SEQUENCE -- frame deduplication, not priority,
-     determines every B-cell slot, so no SEMA score could have arbitrated any
-     choice actually made. Report it as a citation/completeness gap.
+     session and cookie replay. RESOLVED 2026-08-29: SEMA is open source, so it
+     now runs locally and the blocker is removed rather than worked around.
+     THREE THINGS TO WRITE DIFFERENTLY:
+     (a) The method is SEMA-3D on native antigen FOLDS, which is what Sec. I.D
+         describes. The earlier implementation used sequence-only SEMA-1D --
+         the wrong tool for a conformational-epitope claim.
+     (b) The score is the LOG-SCALED EXPECTED NUMBER OF ANTIBODY CONTACTS,
+         ln(1+n), not a probability. The corroboration cut is ln(4)=1.3863
+         (>=3 expected contacts), derived from SEMA's own labelled test set by
+         the Youden criterion the upstream notebook uses: TPR 0.662, FPR 0.072,
+         AUC 0.779. Do not describe it as a probability threshold.
+     (c) REWRITE THE "ZERO EFFECT" CLAIM -- the old wording was unfounded even
+         though the conclusion happens to hold. Three of nine B-cell slots were
+         genuinely contestable (Mpox_B5R had seven candidates for two, Mpox_L1R
+         three for two), so "frame deduplication determines every slot" was
+         false. What is now TRUE, and measured: SEMA-3D was run on all seven
+         native folds and its real calls replayed through Phase 1G at the
+         original seed give 6f34b53e, 566 aa, 100.0% identity -- UNCHANGED.
+         Say "we ran it and it changed nothing", not "it could not have
+         changed anything".
+     (d) REPORT THE ACTUAL CORROBORATION: 1 of 9 B-cell epitopes is
+         structurally corroborated (ATVYGDKIQGKNKRKR, A35R, 56.2% residue
+         overlap), 6 are not, and 2 are unscreenable because they are OPG053
+         rather than L1R (section 5.9). Do not present SEMA as endorsing the
+         B-cell selection -- it does not.
+     Because the construct was fixed and docked before SEMA ran, SEMA is
+     applied as post-hoc annotation rather than as the selection priority
+     Sec. I.D describes ("given priority for inclusion"). State that.
 
 2.4  ToxinPred / HemoPI  ->  ToxinPred2 1.1 / HemoPI2 1.3
      Local pip packages, not the web servers. Same authors (Raghava group),
@@ -413,6 +437,53 @@ something the data does not support, and the text must change.
      consistency check between two methods, not as a filter.
 
 
+
+5.9  ANTIGEN PROVENANCE IS WRONG IN TWO WAYS      [deviation #26 -- NEW, MAJOR]
+     Phase 1A selects each antigen by an Entrez QUERY STRING and stores
+     whatever record returns, labelled with the query name. A gene name is not
+     a protein identity, and two separate defects follow. Both were found while
+     preparing native folds for SEMA-3D -- the first step that ever needed one
+     structure per antigen. Neither is caused by SEMA.
+
+     (A) THE FOUR HIV ANTIGENS ARE TWO POLYPROTEINS.
+         HIV_gp120_Var_01 and HIV_gp41_Var_01 are the same 856-aa Env record
+         (YES72107.1); HIV_p17_Var_01 and HIV_p24_Var_01 are the same 1437-aa
+         Gag-Pol (YES72110.1). Every epitope inherited its query's label
+         regardless of where in the polyprotein it lies, so 9 of the 14 HIV
+         epitopes in the construct are mislabelled.
+         WHAT TO CHANGE IN THE PAPER:
+           - The per-antigen representation table: it is 4 gp120 / 3 gp41 /
+             1 p17 / 6 p24, NOT 4 / 3 / 6 / 1. gp120 and gp41 totals coincide
+             but their membership is swapped.
+           - Any statement that at most two epitopes per antigen per class were
+             taken: HIV_p24/MHC-I holds three and HIV_gp120/MHC-I holds three.
+           - The B-cell coverage gap: it is gp120 that contributes no B-cell
+             epitope, not gp41.
+         Boundaries are alignment-derived against annotated HXB2 references
+         (P04578, P04585) and independently confirmed by cleavage landmarks;
+         both methods agree exactly. Reproducible via
+         Phase1A_provenanceCorrection.py.
+
+     (B) Mpox_B5R IS THE WRONG PROTEIN -- THIS IS THE SERIOUS ONE.
+         QJQ40305.1 (561 aa) is 100.0% identical to OPG189, an ANKYRIN-REPEAT
+         protein (A0A7H0DNF1), and only 25.2% identical to OPG190 (P0DTN2),
+         the actual vaccinia-B5R ortholog, which MPXV names B6R. MPXV has its
+         own unrelated gene called B5R; the query returned that.
+         The intended Mpox set is the classic neutralising trio -- A33R/A35R
+         (EEV), L1R/M1R (IMV), B5R/B6R (EEV). Mpox_A35R (100% OPG161) and
+         Mpox_L1R (100% OPG095/M1R) are both correct. Only the second EEV
+         target is wrong, and an intracellular ankyrin-repeat host-range
+         protein has no neutralising-antibody rationale -- which specifically
+         undercuts the B-cell arm for that antigen.
+         Six of 32 construct epitopes come from it: RRTRHFLSY, MRYGRHPSF
+         (MHC-I); PNEIKYKILENFNDN, IIMDILLSKRPSLKI (MHC-II);
+         ANIDSVDFNGYTPLHY, ACMTDYDTLIDVQSLH (B-cell).
+         THIS CANNOT BE FIXED BY RELABELLING. The paper must either state it
+         as a limitation on the Mpox antigen set, or the antigen must be
+         replaced with OPG190 and Phase 1 re-run -- which means a new
+         construct. Current decision: state it; the construct stays frozen.
+         Do NOT describe B5R as a surface or EEV antigen anywhere in the text.
+
 ================================================================================
 6. INCONSISTENCIES ALREADY INSIDE THE PDF (independent of our work)
 ================================================================================
@@ -424,12 +495,18 @@ that disagree with each other. These need reconciling regardless.
      paragraph). Manuscript version says 500 ns in all three places. Pick one.
      Note the DOST-COARE HPC cost differs by roughly 5x.
 
-6.2  CONFORMATIONAL B-CELL TOOL: SEMA 2.0 vs ElliPro
+6.2  CONFORMATIONAL B-CELL TOOL: SEMA 2.0 vs ElliPro  [SETTLED -- USE SEMA]
      Approval version specifies SEMA 2.0 (and cites Shashkova et al. 2024).
      Manuscript version specifies ElliPro with a protrusion-index threshold of
-     0.5. The implementation targeted SEMA 2.0. Both are currently cited to
-     "Ivanisenko et al., 2024" in the manuscript version, which is the SEMA
-     paper -- so the ElliPro passage cites the wrong reference.
+     0.5. Both are currently cited to "Ivanisenko et al., 2024", which is the
+     SEMA paper -- so the ElliPro passage cites the wrong reference.
+     RESOLVED: SEMA 2.0 (SEMA-3D) has now actually been run, locally, so the
+     conflict is settled in SEMA's favour on the evidence rather than by
+     preference. Delete the ElliPro passage and its protrusion-index threshold
+     from the manuscript version, keep SEMA 2.0 in both, and make the citation
+     consistent. Note that the PDF currently holds TWO concatenated manuscript
+     versions -- the first says SEMA 2.0 and 100 ns MD, the second says ElliPro
+     and 500 ns MD -- so this edit must be applied to both, alongside 6.1.
 
 6.3  MHC-I IMMUNOGENICITY TOOL: BigMHC vs IEDB Immunogenicity tool
      Approval version specifies BigMHC (cited Albert et al. 2023 -- correct,

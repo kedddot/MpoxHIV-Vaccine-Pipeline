@@ -1,0 +1,37 @@
+HOW TO PRODUCE THE NATIVE ANTIGEN STRUCTURES FOR SEMA-3D
+============================================================
+
+WHY: Sec. I.D requires conformational B-cell prediction on the native fold of
+each source antigen. SEMA-3D takes a structure, not a sequence.
+
+WHAT TO SUBMIT: one AlphaFold Server monomer job per FASTA in _submissions/.
+These are MATURE SUBUNITS, not the raw Phase 1A records -- gp120/gp41 share one
+Env polyprotein and p17/p24 share one Gag-Pol polyprotein, so folding the raw
+records would give two antigens the same structure and the same SEMA scores.
+
+  Mpox_L1R      250 aa   Mpox_L1R_Var_01_XYR87238.1.fasta (whole record -- already a mature protein)
+  Mpox_B5R      561 aa   Mpox_B5R_Var_01_QJQ40305.1.fasta (whole record -- already a mature protein)
+  Mpox_A35R     181 aa   Mpox_A35R_Var_01_USS79496.1.fasta (whole record -- already a mature protein)
+  HIV_gp120     473 aa   HIV_gp120_Var_01_YES72107.1.fasta residues 32-504 (Env subunit)
+  HIV_gp41      352 aa   HIV_gp41_Var_01_YES72107.1.fasta residues 505-856 (Env subunit)
+  HIV_p24       231 aa   HIV_p24_Var_01_YES72110.1.fasta residues 136-366 (Gag-Pol subunit)
+  HIV_p17       134 aa   HIV_p17_Var_01_YES72110.1.fasta residues 2-135 (Gag-Pol subunit)
+
+WHERE: https://alphafoldserver.com/  (same tool and workflow as Phase 2B)
+
+WHAT TO DO WITH EACH RESULT
+---------------------------
+Download the job's ZIP, and put the model file for each antigen at:
+
+    Step_Outputs/Phase1/Phase1D/Phase1De/Folds/<TARGET>/
+
+Keep the whole AlphaFold download (all five ranked models plus the confidence
+JSONs), not just the top model -- deviation #21 exists because Step 2B kept only
+model_0 and the fold-confidence problem stayed invisible for a whole phase.
+
+Phase1De_conformational.py picks these up automatically. Any antigen without a
+structure stays SEMA_Corroborated=UNSCREENED rather than blocking the step.
+
+NOTE ON CONFIDENCE: record each model's mean pLDDT. A low-confidence fold
+produces confident-looking SEMA patches that mean nothing, which is the exact
+trap deviation #21 documents for the construct's own model.

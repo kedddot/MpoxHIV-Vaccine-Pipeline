@@ -1,0 +1,8 @@
+Target,Var01_Length,Intended,Best_Match,Best_Match_Accession,Best_Identity_Pct,Intended_Identity_Pct,Verdict
+Mpox_A35R,181,"OPG161 -- VACV A33R ortholog, EEV envelope glycoprotein","OPG161 (EEV glycoprotein, VACV A33R ortholog)",A0A7H0DND2,100.0,100.0,CORRECT
+Mpox_L1R,250,"OPG095 / M1R -- VACV L1R ortholog, IMV membrane protein","OPG095 / M1R (IMV membrane protein, VACV L1R ortholog)",M1LBP0,100.0,100.0,CORRECT
+Mpox_B5R,561,"OPG190 / B6R -- VACV B5R ortholog, EEV envelope glycoprotein",OPG189 (ankyrin repeat protein -- MPXV's own gene named B5R),A0A7H0DNF1,100.0,25.2,WRONG_PROTEIN
+HIV_gp120,856,Env gp160 polyprotein (HXB2 reference),Env gp160 (HXB2),P04578,74.4,74.4,CORRECT
+HIV_gp41,856,Env gp160 polyprotein (HXB2 reference),Env gp160 (HXB2),P04578,74.4,74.4,CORRECT
+HIV_p17,1437,Gag-Pol polyprotein (HXB2 reference),Gag-Pol (HXB2),P04585,89.3,89.3,CORRECT
+HIV_p24,1437,Gag-Pol polyprotein (HXB2 reference),Gag-Pol (HXB2),P04585,89.3,89.3,CORRECT

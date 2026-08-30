@@ -73,11 +73,38 @@ IEDB allele tables  ->  AFND                                  [deviation #7]
   because we needed a specific population and IEDB did not have usable data for
   it. This is the most important wording fix in the whole paper -- see Part 4.
 
-SEMA 2.0  ->  did not run                                     [deviation #20]
+SEMA 2.0  ->  ran it; vaccine unchanged                       [deviation #20]
   SEMA 2.0 predicts B-cell epitopes that form from folded shapes rather than
-  straight sequence. Its website blocks any computer program that is not a real
-  human browser, and we could not get past it. This only means we are missing
-  extra proof; it did not change a single epitope in our vaccine.
+  straight sequence. Its website blocks any program that is not a real human
+  browser. But SEMA's code is public, so we installed it and run it ourselves,
+  and the website no longer matters.
+  Three things we got wrong before and have now fixed:
+    - We were using the SEMA version that reads the plain SEQUENCE. Our paper
+      asks for the version that reads the folded SHAPE. Predicting shape-based
+      epitopes from sequence alone was the wrong tool for the claim.
+    - We treated a SEMA score above 0.5 as "this is an epitope". SEMA scores
+      are not percentages -- they are the logged number of expected antibody
+      contacts, and they can be negative. The correct cut-off is 1.386
+      (three expected contacts), which we worked out from SEMA's own test data.
+      Every number computed with the old 0.5 rule was meaningless.
+    - We previously wrote that SEMA "did not change a single epitope in our
+      vaccine". The CONCLUSION turned out to be right, but the REASON we gave
+      was wrong, so the sentence still had to go. We had said no SEMA score
+      could ever have mattered; in fact Mpox_B5R had seven real B-cell
+      candidates competing for two places and Mpox_L1R had three for two, so
+      SEMA genuinely could have decided them.
+      WHAT WE DID: ran SEMA for real on 3D shapes of all seven antigens, fed
+      its answers back into the vaccine-building step with the same settings,
+      and compared. The result is the exact same 566-letter vaccine, letter for
+      letter. So we can now say "we ran it and it changed nothing" -- which is
+      a much stronger sentence than the one we deleted, because it is measured
+      rather than assumed.
+    - What SEMA actually thinks of our B-cell epitopes is worth being honest
+      about: only 1 of our 9 is backed up by the folded shape
+      (ATVYGDKIQGKNKRKR, from A35R). Six are not, and two cannot be checked at
+      all because they come from the wrong protein (see the antigen problem
+      below). SEMA does not endorse our B-cell picks; it just does not change
+      them.
 
 ToxinPred and HemoPI  ->  ToxinPred2 and HemoPI2
   These predict if a peptide is toxic or destroys red blood cells. We used the
@@ -334,8 +361,9 @@ version of our own paper disagree with each other. Fix before submitting.
      The computer time needed differs by about five times.
 
   2. Conformational B-cell tool: approval says SEMA 2.0, manuscript says
-     ElliPro. We tried SEMA. Also, the ElliPro paragraph cites the SEMA paper,
-     so the citation is wrong either way.
+     ElliPro. Also, the ElliPro paragraph cites the SEMA paper, so the citation
+     is wrong either way. SETTLED: we have now actually run SEMA, so use SEMA
+     2.0 in both places and delete the ElliPro sentence.
 
   3. Immunogenicity tool: approval says BigMHC, manuscript says IEDB
      Immunogenicity tool. Both cite Albert et al. 2023, which is the BigMHC
@@ -483,7 +511,11 @@ These are our own reasoning or our own measurements. Do not imply otherwise.
      tools that agree with each other.
 #19  Reading BigMHC negative scores         disclosed assumption about a tool
      whose output range is bounded.
-#20  SEMA blocked                           a fact about a third-party website.
+#20  SEMA run; vaccine unchanged           we removed the blocker instead of
+     working around it, fixed a wrong tool and a meaningless cut-off, and
+     replaced an assumed claim with a measured one.
+#26  Two antigens are not what we said     our own finding, checked two
+     independent ways. See below.
 #24  Allergy needs both tools to agree      our own measurement (they disagree
      59% of the time). Helped by the fact that our paper ALREADY requires
      two-tool agreement in Section II.A.a, so we are making it consistent.
@@ -569,3 +601,49 @@ The three most likely questions, and the short answers:
       the exact part that triggers TLR-2 and TLR-4. Docking the rest would be
       docking a random guess that no one could reproduce. (#21)
 ================================================================================
+
+
+================================================================================
+THE ANTIGEN PROVENANCE PROBLEM (deviation #26) -- IN PLAIN WORDS
+================================================================================
+
+We pick our seven antigens by typing a gene name into NCBI's search box and
+keeping whatever comes back. A gene name is not the same thing as a protein,
+and that caused two separate problems. We found them while getting 3D shapes
+ready for SEMA -- the first step that ever needed one shape per antigen.
+
+PROBLEM 1: our four HIV "antigens" are really only two proteins.
+  gp120 and gp41 are two halves of one big protein called Env, and NCBI gave us
+  the whole thing both times -- the same file twice. Same story for p17 and p24,
+  which are two halves of Gag. So when we cut the protein into small pieces,
+  every piece got labelled with whichever search found it, not with the half it
+  actually came from.
+  Result: 9 of our 14 HIV epitopes have the wrong antigen name attached.
+    - Our table says 4 gp120 / 3 gp41 / 6 p17 / 1 p24.
+      The truth is  4 gp120 / 3 gp41 / 1 p17 / 6 p24.
+    - We said we take at most two epitopes per antigen per type. We actually
+      took three from p24 and three from gp120 without noticing.
+    - We said gp41 has no B-cell epitope. It does. The one with none is gp120.
+  We checked the halfway points two completely different ways -- by lining our
+  sequence up against the reference HIV strain, and by finding the exact spot
+  where the virus's own enzymes cut the protein. Both gave the same answer.
+
+PROBLEM 2: our "B5R" is not the protein we think it is. This is the serious one.
+  Mpox and vaccinia (the smallpox vaccine virus) name their genes differently.
+  The famous vaccine target called B5R in vaccinia is called B6R in Mpox. Mpox
+  ALSO has its own gene called B5R -- and it is a completely different protein.
+  We searched for "B5R" and got Mpox's B5R, which is an ankyrin-repeat protein
+  that sits INSIDE the cell. It is 100% identical to that one, and only 25%
+  identical to the surface protein we meant to use.
+  Why this matters: the three classic Mpox vaccine targets are A35R, L1R and
+  B5R/B6R. The first two we got right -- we checked, they are exactly correct.
+  The third is a protein antibodies cannot reach, so the antibody half of our
+  argument does not hold for that antigen. Six of our 32 epitopes come from it.
+  This one CANNOT be fixed by relabelling -- it is the wrong sequence, not the
+  wrong name. Fixing it properly means fetching the right protein and redoing
+  Phase 1 for it, which means a different vaccine. We have chosen not to do
+  that, so it must be written up honestly as a limitation instead.
+
+WHAT WE DID ABOUT BOTH: nothing to the vaccine. It is already built, checked and
+docked, so we left it alone. We wrote a script that reports both problems and
+changes nothing, and the paper needs to state them.

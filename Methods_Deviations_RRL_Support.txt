@@ -452,64 +452,104 @@ pairs, all top-1%-percentile-rank survivors from Phase 1Db): 408
 PRIORITIZED, 5,128 DEPRIORITIZED -- none excluded, per the paper's own
 "not automatically excluded" wording.
 
-20. SEMA 2.0 API IS ANTI-BOT BLOCKED -- MANUAL FALLBACK, NON-BLOCKING
+20. SEMA 2.0 -- RESOLVED. RUN LOCALLY AS SEMA-3D; CONSTRUCT UNCHANGED
 ------------------------------------------------------------------------
 CHANGED: Sec. I.D specifies SEMA 2.0 for conformational B-cell-epitope
-corroboration. SEMA 2.0 documents a real REST API (sema.airi.net/
-openapi.json), which in principle needs no manual submission. In practice,
-its actual prediction endpoint (POST /proteins) sits behind a commercial
-anti-bot WAF (ServicePipe): verified directly this session with both the
-`requests` library (form-encoded AND true multipart/form-data, matching
-the documented schema) and a real headless Chromium via Playwright, which
-was fingerprinted as automation and blocked outright (HTTP 403 on the bare
-homepage). This is the same class of external blocker as RaptorX being
-down (#16) or AllerTOP/AllergenFP having no API at all (#Manual-round) --
-a third-party protection choice, not something to keep circumventing with
-browser-automation evasion.
-WHY NON-BLOCKING: Phase 1De attempts the automated call once per target,
-falls back to a manual-submission template (paste the per-residue JSON
-after a human runs the site's own "Predict epitopes" tab), and Phase 1G
-proceeds treating any unfilled target's B-cell candidates as
-SEMA_Corroborated=UNSCREENED -- annotation-only, never exclusionary, so
-this cannot block construction. Practical impact on the actual construct is
-small regardless: every target's B-cell pool has <=3 candidates after the
-Sec. I.E/I.G screens and MAX_EPITOPES_PER_TARGET_PER_CLASS already takes 2
-of them, so SEMA mainly supplies the REQUIRED annotation/justification the
-paper asks for, not a different selection.
-STATUS: all 7 targets are UNSCREENED (API blocked for all of them; the
-manual round was deliberately NOT run -- see below). If a genuine browser
-session completes the manual submissions before publication, this deviation
-is removed entirely -- worth checking.
-RE-VERIFIED 2026-08-27 (endpoint-by-endpoint, so the claim is precise rather
-than blanket): GET /openapi.json now returns real JSON and the full documented
-schema -- POST /proteins takes multipart/form-data with seq+esm_switch or
-pdb_id+chain, results at GET /proteins/{id}/{csv,json,pdb,zip}_data. That
-single path is on the WAF's static whitelist. Every FUNCTIONAL endpoint still
-returns HTTP 200 with the ServicePipe JS-challenge page instead of JSON:
-tested /about, /docs, /prediction_analysis, /proteins/{id}, and both
-/proteins/{id}/csv_data and /json_data, plus POST /proteins itself, all with a
-full Chrome User-Agent, browser Accept/Origin/Referer/Sec-Fetch-* headers, and
-a warmed session. Replaying the spsn/spid cookies the challenge page hands out
-does not clear it either -- the challenge requires executing the remote
-servicepipe.tech script, i.e. genuine browser-automation evasion. So the
-schema is documented but unreachable; "blocked" remains the correct word.
-NOTE FOR THE WRITE-UP: cite the blocker as the endpoint set above, not as
-"the API is down" -- openapi.json responding would otherwise look like a
-contradiction to any reviewer who checks it.
-WHY THE MANUAL ROUND WAS SKIPPED (verified, not assumed): every B-cell slot
-in the final construct is FORCED, so SEMA could not have changed the
-selection even with complete data. Traced per target against the post-screen
-pool: HIV_gp120 has exactly 1 usable B-cell candidate; HIV_gp41 has 0;
-Mpox_A35R, Mpox_B5R and Mpox_L1R have 2 each and both are taken; and every
-remaining "spare" (HIV_p17 and HIV_p24's three EPFRDY-region frames,
-Mpox_A35R's CAAESSTLPNKSDVLT) overlaps an already-selected epitope and is
-correctly blocked by the sliding-window frame-dedup rule regardless of any
-SEMA score. There is no (target, class) cell anywhere in this construct
-where SEMA would arbitrate between two genuinely distinct candidates. The
-gap is therefore a citation/completeness gap ONLY, with zero effect on the
-shipped sequence -- state it that way rather than implying missing data
-weakened the design.
-
+corroboration. The hosted service documents a real REST API
+(sema.airi.net/openapi.json), but every FUNCTIONAL endpoint sits behind a
+commercial anti-bot WAF (ServicePipe) that returns the SPA's JS-challenge
+page with HTTP 200 instead of JSON. Re-verified endpoint-by-endpoint on
+2026-08-27: GET /openapi.json serves the real schema (it is on the WAF's
+static whitelist), while POST /proteins and every GET /proteins/{id}/*_data
+are intercepted, with a full Chrome User-Agent, browser Accept/Origin/
+Referer/Sec-Fetch-* headers and a warmed session; replaying the spsn/spid
+challenge cookies does not clear it either, since the challenge requires
+executing the remote servicepipe.tech script. Cite the blocker as that
+endpoint set, not as "the API is down" -- openapi.json responding would
+otherwise look like a contradiction to any reviewer who checks it.
+RESOLUTION (2026-08-29): the hosted API is no longer used. SEMA is open
+source (github.com/AIRI-Institute/SEMAi) and the model now runs LOCALLY, so
+the third-party blocker is removed rather than worked around. Installed as
+conda env `sema_env` with the five SEMA-3D checkpoints and the SaProt-650M
+base model; foldseek comes from Homebrew because the binary vendored in the
+repo is a Linux x86-64 ELF. Validated on SEMA's own bundled test structure:
+136 residues in, 136 per-residue scores out, range -0.12 to 1.68.
+THREE SUBSTANTIVE CORRECTIONS CAME OUT OF DOING THIS PROPERLY:
+(a) SEMA-1D vs SEMA-3D. The previous implementation submitted
+    esm_switch="1d" -- the sequence-only ESM-2 model -- against the raw
+    FASTA. Sec. I.D specifies the structure-based method: conformational
+    epitope propensity "directly from AlphaFold-predicted or experimentally
+    solved structures". Predicting CONFORMATIONAL epitopes from sequence
+    alone was the wrong tool for the claim. Now SEMA-3D on a native fold per
+    antigen (Phase1De_foldPrep.py prepares the submissions).
+(b) THE THRESHOLD WAS MEANINGLESS. The old code treated ">= 0.5" as "in an
+    epitope patch", on a comment asserting SEMA scores are "probability-like
+    in [0,1]". They are not. SEMA outputs the LOG-SCALED EXPECTED NUMBER OF
+    ANTIBODY CONTACTS, ln(1 + contacts) -- unbounded, routinely negative. In
+    SEMA 2.0's own training data ln(2)=0.6931 is one contact and
+    ln(4)=1.3863 is three. The cut is now DERIVED from SEMA's own labelled
+    test set (11,302 residues) by the same Youden criterion the upstream
+    inference notebook uses: the optimum is ln(4), TPR 0.662 at FPR 0.072,
+    AUC 0.779. Any SEMA_Overlap_Pct computed under the old 0.5 cut would
+    have been uninterpretable.
+(c) THE "FORCED SLOTS" ARGUMENT WAS FALSE. This file previously claimed
+    every B-cell slot was forced -- "HIV_gp120 has exactly 1 usable B-cell
+    candidate; HIV_gp41 has 0; Mpox_A35R, Mpox_B5R and Mpox_L1R have 2 each
+    and both are taken" -- and used that to justify skipping SEMA entirely.
+    Re-derived from the shipped Phase 1F pool under Phase 1G's own screens
+    (count_hydrophobic_windows, LINKER_MOTIFS, _shares_frame,
+    SELECTION_WINDOW=7) with cross-class dedup against the construct's own
+    MHC-I/II picks, the true per-target counts of DISTINCT B-cell candidates
+    are: gp120 1, gp41 0, p17 2, p24 2, A35R 2, Mpox_B5R SEVEN, Mpox_L1R
+    THREE. Mpox_B5R's five unselected alternatives (ADLLKMCIKYTACMTD,
+    AEDSYGCTLLHRCIYN, AELFEICLENANIDSV, AGDKWSCFPNEIKYKI, AVESLDYLLSRGVIDI)
+    and Mpox_L1R's DIQKLNIGECSAPPGQ are genuinely distinct regions, not
+    shifted frames of the selected pairs. Three of the nine B-cell slots
+    were therefore contestable and SEMA could have arbitrated them. A
+    reviewer can reproduce this from the shipped Phase 1F CSV, so the claim
+    had to go.
+MEASURED ENVELOPE (Phase1G_sensitivity.py, real pool, RNG_SEED=20260824,
+replaying Phase 1G's own objective rather than a copy of it):
+    baseline, all UNSCREENED        -> 6f34b53e, 566 aa == the shipped construct
+    best case, selected corroborated-> 6f34b53e, 566 aa, 100.0% identity, NO CHANGE
+    worst case, only the unselected
+      alternatives corroborated     -> 24d8424e, 587 aa, 27.2% identity, 7 of 9
+                                       B-cell epitopes swapped AND both T-cell
+                                       blocks changed
+    REAL SEMA-3D LABELS (2026-08-29, the measurement that settles it):
+                                    -> 6f34b53e, 566 aa, 100.0% identity, UNCHANGED
+So the effect was data-dependent across a very wide envelope, and the data
+landed at the benign end. SEMA-3D was run on AlphaFold models of all seven
+native antigens, its calls were fed back through Phase 1G's own objective at
+the original seed, and the construct is byte-identical to the shipped one.
+DEVIATION #20 IS THEREFORE RETIRED as a gap: SEMA is no longer missing, and
+its result changes nothing. What must still be stated in the manuscript is
+that SEMA ran AFTER the construct was fixed, so it is a post-hoc
+corroboration rather than the selection priority Sec. I.D describes -- the
+outcome is the same either way, but the order of operations was not.
+WHAT SEMA ACTUALLY SAID about the nine shipped B-cell epitopes: 1 corroborated
+(ATVYGDKIQGKNKRKR, Mpox_A35R, 56.2% residue overlap), 6 not corroborated, 2
+unscreenable. The two unscreenable ones (AYAEVNNIIDIQKLNI, CSAPPGQHMLLQIVNT)
+are the OPG053 epitopes from deviation #26(C) -- they cannot be scored on an
+L1R fold because they are not L1R. Report the 1/9 honestly: it means the
+selected B-cell epitopes are largely NOT structurally corroborated on their
+native folds, and the one that is belongs to A35R, the only Mpox antigen that
+is the intended protein.
+A SEPARATE 1G DESIGN FLAW THE WORST CASE EXPOSED: n_prioritized sums BigMHC
+MHC-I priority and SEMA B-cell corroboration into ONE scalar, so two
+corroborated B-cell epitopes can outrank two BigMHC-prioritised CTL
+epitopes. Those are not commensurable quantities and should be separate keys
+in the sort tuple. That is why a B-cell-only signal perturbs the CTL and HTL
+blocks at all. Reported rather than silently fixed, because changing it
+would change the construct.
+STATUS: the construct Vax_Final_6f34b53e is FROZEN. Phase 1De now writes to
+a Sensitivity/ directory that nothing reads automatically; it previously
+wrote its enriched CSV back into Phase1Db/, where Phase 1G picks input via
+latest_file(), so merely RUNNING the step with real data would have silently
+armed a different construct. SEMA is therefore applied as post-hoc
+annotation, not as the selection priority Sec. I.D describes ("given priority
+for inclusion in the final construct") -- that difference must be stated in
+the manuscript.
 21. ALPHAFOLD FOLD CONFIDENCE GATES PHASE III SCOPE -- DOCK THE ADJUVANT,
     NOT THE WHOLE CONSTRUCT
 ------------------------------------------------------------------------
@@ -771,7 +811,8 @@ BOTTOM LINE
   #17 junction-created motif screen - extends #I.G's own stated rationale
   #18 hydrophobic-fraction finding  - reframes a flag as a disorder signal
   #19 BigMHC negative-score reading - bounded-output tool, disclosed assumption
-  #20 SEMA 2.0 WAF-blocked          - forced by a third-party anti-bot system
+  #20 SEMA 2.0 -- RESOLVED          - run locally; construct verified UNCHANGED
+                                      under its real labels, so the gap is closed
   #21 fold confidence scopes PhaseIII - MEASURED, four agreeing axes; the
                                       thresholds are external convention
   #22 IEDB corroboration (new 1H)   - ADDITION beyond the paper; strengthens
@@ -782,6 +823,125 @@ BOTTOM LINE
                                       did NOT fix the gp41 B-cell gap
   #25 CamSol 2A check was inert     - a score tested as if it were a length;
                                       corrected reading now strengthens #15
+  #26 Phase 1A antigen provenance   - MEASURED; 9/14 HIV epitopes mislabelled;
+                                      Mpox_B5R is OPG189 (ankyrin), not the EEV
+                                      glycoprotein OPG190/B6R; and half the
+                                      Mpox_L1R pool is OPG053, so 4 of the 9
+                                      B-cell epitopes come from unintended
+                                      proteins and L1R conservancy is void
+
+26. PHASE 1A SELECTS ANTIGENS BY GENE-NAME STRING -- TWO CONSEQUENCES
+------------------------------------------------------------------------
+FOUND: Phase1A_sequenceRetrival.py defines each antigen as an Entrez QUERY
+STRING (e.g. 'gp120 AND "HIV-1"[Organism] AND CRF01_AE', 'B5R AND
+"Monkeypox virus"[Organism]') and stores whatever record comes back WHOLE,
+labelled with the query name. A gene name is not a protein identity, and two
+independent defects follow. Both were found while preparing native folds for
+SEMA-3D, which is the first step that ever needed one structure PER ANTIGEN.
+Neither is caused by SEMA and neither is fixed by it.
+
+(A) THE FOUR HIV TARGETS ARE TWO POLYPROTEINS, AND 9 OF 14 HIV EPITOPES
+    CARRY THE WRONG Target LABEL.
+    HIV_gp120_Var_01 and HIV_gp41_Var_01 are THE SAME FILE: the 856-aa Env
+    polyprotein YES72107.1. HIV_p17_Var_01 and HIV_p24_Var_01 are the same
+    1437-aa Gag-Pol YES72110.1. Phase 1Da then slid a k-mer window over each
+    stored record and tagged every peptide with that record's target label,
+    so an epitope's Target says which QUERY retrieved its parent record, not
+    which protein the peptide sits in.
+    BOUNDARIES (two independent methods, exact agreement). The GenBank
+    records carry no mat_peptide features, so ranges come from a global
+    BLOSUM62 alignment of each Var_01 record against its annotated HXB2
+    reference with the reference's UniProt CHAIN features mapped through:
+    Env vs P04578 (CHAIN 33..511 gp120, 512..856 gp41) -> Var_01 gp120
+    32-504, gp41 505-856; Gag-Pol vs P04585 (CHAIN 2..132 p17, 133..363 p24)
+    -> Var_01 p17 2-135, p24 136-366. Corroborated by cleavage landmarks in
+    the stored sequences themselves: the Env furin site plus fusion peptide
+    "...RVVERPKR | AVGIGAMIFGF" puts gp41 at 505, and the Gag MA/CA junction
+    "...SQNY | PIVQ" puts p24 at 136, ending "...KARVL" at 366.
+    RESULT (all 14 HIV epitopes in the construct resolved, none unknown):
+      mislabelled as gp120, actually gp41 : LLSGIVQQQSNLLRA, LTVWGIKQLQARVLAV
+      mislabelled as gp41,  actually gp120: SLWDQSLKP, PIPIHYCTPAGYAIL
+      mislabelled as p17,   actually p24  : PEVIPMFSALSEGAT, SEGATPQDL,
+                                            YKRWIILGLNKIVRM, GPKEPFRDY,
+                                            PFRDYVDRFYKTLRAE
+      correctly labelled                  : MIVGGLIGL, ASRELERFALNPGLLE,
+                                            SPRTLNAWV
+      KPCVKLTPL and KPVVSTQLL are absent from Var_01 and were resolved
+      against their own source variant (HIV_gp120_Var_06_YAA49993.1); both
+      are genuinely gp120.
+    THREE CLAIMS THIS BREAKS:
+      1. Per-antigen representation is 4 gp120 / 3 gp41 / 1 p17 / 6 p24, not
+         the labelled 4 / 3 / 6 / 1. The gp120 and gp41 totals coincide, but
+         their MEMBERSHIP is swapped.
+      2. MAX_EPITOPES_PER_TARGET_PER_CLASS = 2 is enforced on the LABEL, so
+         it was silently violated on true targets: HIV_p24/MHC-I holds three
+         (GPKEPFRDY, SEGATPQDL, SPRTLNAWV) and HIV_gp120/MHC-I holds three
+         (KPCVKLTPL, KPVVSTQLL, SLWDQSLKP).
+      3. The recorded "HIV_gp41 contributes zero B-cell epitopes" gap is
+         false -- LTVWGIKQLQARVLAV is a gp41 B-cell epitope. The antigen
+         with no B-cell epitope is HIV_gp120.
+
+(B) Mpox_B5R IS NOT THE INTENDED ANTIGEN. It is an ankyrin-repeat protein.
+    QJQ40305.1 (561 aa) is 100.0% identical to OPG189, "Ankyrin repeat
+    protein" (UniProt A0A7H0DNF1, 561 aa), and only 25.2% identical to
+    OPG190 (P0DTN2, 317 aa) -- the actual vaccinia-B5R ortholog, which MPXV
+    names B6R. The cause is poxvirus nomenclature: orthologous genes do not
+    share names across species, and MPXV has its OWN gene called B5R which
+    is unrelated to vaccinia's. The Entrez query returned exactly what it
+    asked for.
+    WHY IT MATTERS: the intended Mpox antigens are the classic neutralising
+    trio -- A33R/A35R (EEV envelope glycoprotein), L1R/M1R (IMV membrane
+    protein) and B5R/B6R (EEV envelope glycoprotein). Verified against
+    UniProt, Mpox_A35R IS OPG161 (100.0%, the A33R ortholog) and Mpox_L1R IS
+    OPG095/M1R (100.0%, the L1R ortholog). Only the third is wrong, and it
+    is the second EEV target: an intracellular ankyrin-repeat host-range
+    protein has no neutralising-antibody rationale, which specifically
+    undercuts the B-cell arm for that antigen. Six of the 32 construct
+    epitopes derive from it: RRTRHFLSY and MRYGRHPSF (MHC-I),
+    PNEIKYKILENFNDN and IIMDILLSKRPSLKI (MHC-II), ANIDSVDFNGYTPLHY and
+    ACMTDYDTLIDVQSLH (B-cell). The fifth contains the ankyrin TPLH
+    signature outright.
+    UNLIKE (A), THIS CANNOT BE FIXED BY RELABELLING -- the sequence is the
+    wrong protein. Correcting it would mean retrieving OPG190 and re-running
+    Phase 1 for that antigen, i.e. a new construct.
+
+(C) HALF THE Mpox_L1R VARIANT POOL IS A DIFFERENT GENE, AND BOTH L1R B-CELL
+    EPITOPES COME FROM IT.
+    Var_01 (XYR87238.1, 250 aa) is 100.0% OPG095/M1R -- the genuine VACV-L1R
+    ortholog. But 16 of the 30 records in that target's pool are 212 aa and
+    99.5% identical to OPG053 (A0A7H0DN26), a DIFFERENT entry-fusion-complex
+    protein, only 25.9% identical to L1R. The query 'L1R AND "Monkeypox
+    virus"[Organism]' matches both because submitters annotate OPG053 with
+    similar wording.
+    CONSEQUENCE 1 -- THE EPITOPES. Both L1R B-cell epitopes in the construct,
+    AYAEVNNIIDIQKLNI and CSAPPGQHMLLQIVNT, are absent from L1R and present in
+    OPG053. They are OPG053 epitopes labelled as L1R. Together with (B) this
+    means FOUR of the nine B-cell epitopes -- the two Mpox_B5R ones and these
+    two -- derive from proteins the study did not intend to target.
+    CONSEQUENCE 2 -- CONSERVANCY. Conservancy for Mpox_L1R was computed across
+    a pool mixing two unrelated genes at ~26% identity, so every L1R
+    conservancy figure is comparing different proteins and cannot be
+    interpreted. This is the reason the check now runs over the whole pool and
+    not just Var_01.
+    THE OTHER SIX POOLS ARE HOMOGENEOUS by this test (Mpox_A35R >=98.3%,
+    Mpox_B5R >=99.5% -- consistently the same wrong protein from (B) -- and
+    all four HIV pools >=73%). The HIV pools do span a wide LENGTH range
+    (gp120 153-871 aa, p17/p24 307-1437 aa) because partial records sit
+    alongside full polyproteins; that is the same protein throughout, but it
+    means conservancy there is computed over fragments as well as full-length
+    entries and should be described as such.
+
+STATUS: REPORTED, NOT CORRECTED IN THE PIPELINE. Vax_Final_6f34b53e has been
+through all of Phase 2 and has been docked, so it is frozen by decision.
+Phase1A_provenanceCorrection.py emits both audits as standalone reports under
+Step_Outputs/Phase1/Phase1A/Provenance_Correction/ and rewrites nothing --
+writing a corrected pool into Phase1F/Filtered/ would change Phase 1G's input
+and therefore the construct. The identity check aligns every antigen against
+a panel of candidate references and reports the BEST match, so a wrong
+antigen surfaces as a result rather than as an assertion; it can be re-run by
+anyone. What the manuscript must do is state (A) as a corrected provenance
+table and (B) as a limitation on the Mpox antigen set.
+
 
 No unsourced DATA remains anywhere.
 
