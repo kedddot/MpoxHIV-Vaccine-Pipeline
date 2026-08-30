@@ -569,7 +569,9 @@ that disagree with each other. These need reconciling regardless.
   II.C.I.C  correct 774 vs 500+500; frame as a consistency check (5.8)
   II.C.I.D  state the 21-allele MHC-II panel (4.3); reconcile 1% vs 2% (6.4);
             settle BigMHC vs IEDB Immunogenicity (6.3); settle SEMA vs
-            ElliPro and record that SEMA did not run (6.2, 2.3)
+            ElliPro in SEMA's favour and describe SEMA-3D on native folds with
+            the ln(4) contact-count cut, NOT a probability threshold (6.2, 2.3);
+            report 1 of 9 B-cell epitopes corroborated (2.3d)
   II.C.I.E  allergenicity consensus rule (4.8); evidence-based toxicity (4.1)
   II.C.I.F  AFND + Austronesian proxy wording (5.1); coverage prioritised not
             required (4.7); ADD the cumulative-coverage subsection (3.2)
@@ -594,5 +596,7 @@ that disagree with each other. These need reconciling regardless.
   Limitations  add: gp41 has no B-cell epitopes and why (5.2); p17 has no
             unique epitope (5.2); the global fold is undetermined (5.3);
             predicted solubility is unresolved and the predictors disagree
-            (5.5); SEMA never ran (2.3); coverage is a proxy population (5.1)
+            (5.5); SEMA ran and the construct is unchanged (2.3); coverage is
+            a proxy population (5.1); antigen provenance is wrong for Mpox_B5R
+            and Mpox_L1R and for 9 of 14 HIV epitope labels (5.9)
 ================================================================================
